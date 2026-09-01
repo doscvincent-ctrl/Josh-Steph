@@ -319,6 +319,26 @@ export function RSVP() {
                   : "pointer-events-none opacity-40"
               }`}
             >
+              {/* Names linked to code list display (stacked line by line) */}
+              <div className="rounded-lg border px-4 py-3" style={fieldStyle}>
+                <p
+                  className="mb-1.5 text-xs uppercase tracking-[0.12em]"
+                  style={{ color: P.burgundyDk }}
+                >
+                  Invited Party
+                </p>
+                {matchedParty ? (
+                  <ul className="space-y-1 text-[0.9rem] opacity-80">
+                    {names.map((name, index) => (
+                      <li key={`${name}-${index}`}>{name}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span className="text-[0.95rem]">
+                    Guest names will appear here
+                  </span>
+                )}
+
               {/* Single Merged Attendance Dropdown */}
               <div className={fieldWrapClass} style={fieldStyle}>
                 <select
@@ -342,26 +362,6 @@ export function RSVP() {
                   ⌄
                 </span>
               </div>
-
-              {/* Names linked to code list display (stacked line by line) */}
-              <div className="rounded-lg border px-4 py-3" style={fieldStyle}>
-                <p
-                  className="mb-1.5 text-xs uppercase tracking-[0.12em]"
-                  style={{ color: P.burgundyDk }}
-                >
-                  Invited Party
-                </p>
-                {matchedParty ? (
-                  <ul className="space-y-1 text-[0.9rem] opacity-80">
-                    {names.map((name, index) => (
-                      <li key={`${name}-${index}`}>{name}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span className="text-[0.95rem]">
-                    Guest names will appear here
-                  </span>
-                )}
               </div>
 
               <textarea
