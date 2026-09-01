@@ -99,7 +99,6 @@ export function RSVP() {
 
   useEffect(() => {
     if (matchedParty) {
-      // Calculate how many were marked 'yes' originally, or default to max party count
       const initialCount = matchedParty.filter((inv) => inv.attendance === "yes").length
       setForm((current) => ({
         ...current,
@@ -121,23 +120,29 @@ export function RSVP() {
     setForm((current) => ({ ...current, code: value }))
   }
 
-  const handleAttendanceChange = (value: string) => {
+  const handleSelectionChange = (value: string) => {
     setErrorMessage("")
 
-    setForm((current) => ({
-      ...current,
-      attendance: value,
-      guestCount: value === "no" ? 0 : current.guestCount || maxGuests,
-    }))
-  }
-
-  const handleGuestCountChange = (count: number) => {
-    setErrorMessage("")
-    setForm((current) => ({
-      ...current,
-      guestCount: count,
-      attendance: count > 0 ? "yes" : current.attendance,
-    }))
+    if (value === "no") {
+      setForm((current) => ({
+        ...current,
+        attendance: "no",
+        guestCount: 0,
+      }))
+    } else if (value.startsWith("yes-")) {
+      const count = Number(value.replace("yes-", ""))
+      setForm((current) => ({
+        ...current,
+        attendance: "yes",
+        guestCount: count,
+      }))
+    } else {
+      setForm((current) => ({
+        ...current,
+        attendance: "",
+        guestCount: 0,
+      }))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -159,12 +164,7 @@ export function RSVP() {
     }
 
     if (!form.attendance) {
-      setErrorMessage("Please let us know if you will be attending.")
-      return
-    }
-
-    if (form.attendance === "yes" && form.guestCount <= 0) {
-      setErrorMessage("Please select at least 1 guest attending.")
+      setErrorMessage("Please select your attendance status.")
       return
     }
 
@@ -172,7 +172,6 @@ export function RSVP() {
     setErrorMessage("")
 
     try {
-      // Mark up to `guestCount` guests as attending to match the payload structure expected by Google Apps Script
       const attendingGuestsPayload = matchedParty.map((invitee, index) => ({
         name: invitee.name,
         email: invitee.email,
@@ -207,6 +206,14 @@ export function RSVP() {
     borderColor: P.taupe,
     color: P.black,
   }
+
+  // Helper value calculation for the merged dropdown
+  const selectedDropdownValue =
+    form.attendance === "no"
+      ? "no"
+      : form.attendance === "yes"
+        ? `yes-${form.guestCount}`
+        : ""
 
   return (
     <section id="rsvp" className="py-16 px-4" style={{ background: P.beige }}>
@@ -312,18 +319,23 @@ export function RSVP() {
                   : "pointer-events-none opacity-40"
               }`}
             >
-              {/* Attendance Status */}
+              {/* Single Merged Attendance Dropdown */}
               <div className={fieldWrapClass} style={fieldStyle}>
                 <select
-                  value={form.attendance}
+                  value={selectedDropdownValue}
                   disabled={!isUnlocked}
                   onChange={(event) =>
-                    handleAttendanceChange(event.target.value)
+                    handleSelectionChange(event.target.value)
                   }
                   className={`${fieldClass} appearance-none`}
                 >
                   <option value="">Will you attend?</option>
-                  <option value="yes">Yes, we will attend</option>
+                  {maxGuests > 0 &&
+                    Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
+                      <option key={num} value={`yes-${num}`}>
+                        {num} {num === 1 ? "guest" : "guests"} attending
+                      </option>
+                    ))}
                   <option value="no">No, we can't attend</option>
                 </select>
                 <span className="text-base" style={{ color: P.black }}>
@@ -331,41 +343,20 @@ export function RSVP() {
                 </span>
               </div>
 
-              {/* Guest Count Dropdown */}
-              {form.attendance === "yes" && maxGuests > 0 && (
-                <div className={fieldWrapClass} style={fieldStyle}>
-                  <select
-                    value={form.guestCount}
-                    disabled={!isUnlocked}
-                    onChange={(event) =>
-                      handleGuestCountChange(Number(event.target.value))
-                    }
-                    className={`${fieldClass} appearance-none`}
-                  >
-                    {Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
-                      <option key={num} value={num}>
-                        {num} {num === 1 ? "guest" : "guests"} attending
-                      </option>
-                    ))}
-                  </select>
-                  <span className="text-base" style={{ color: P.black }}>
-                    ⌄
-                  </span>
-                </div>
-              )}
-
-              {/* Names linked to code list display */}
+              {/* Names linked to code list display (stacked line by line) */}
               <div className="rounded-lg border px-4 py-3" style={fieldStyle}>
                 <p
-                  className="mb-1 text-xs uppercase tracking-[0.12em]"
+                  className="mb-1.5 text-xs uppercase tracking-[0.12em]"
                   style={{ color: P.burgundyDk }}
                 >
                   Invited Party
                 </p>
                 {matchedParty ? (
-                  <p className="text-[0.9rem] opacity-80">
-                    {names.join(", ")}
-                  </p>
+                  <ul className="space-y-1 text-[0.9rem] opacity-80">
+                    {names.map((name, index) => (
+                      <li key={`${name}-${index}`}>{name}</li>
+                    ))}
+                  </ul>
                 ) : (
                   <span className="text-[0.95rem]">
                     Guest names will appear here

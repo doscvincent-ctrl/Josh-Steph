@@ -57,7 +57,7 @@ export const DETAILS = [
     icon: "♡",
     label: "Ceremony",
     line1: "February 5, 2027 · 3:00 PM",
-    line2: "TFruella’s Events Place",
+    line2: "Fruella’s Events Place",
     line3: "Tagaytay City, Philippines",
   },
   {
