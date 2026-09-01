@@ -31,9 +31,6 @@ async function submitRSVP(form: RSVPForm) {
   const response = await fetch(SHEETS_URL, {
     method: "POST",
     mode: "no-cors",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-    },
     body,
   })
 

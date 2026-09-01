@@ -30,18 +30,22 @@ function doPost(e) {
   ])
 
   if (data.email) {
-    MailApp.sendEmail({
-      to: data.email,
-      subject: "RSVP confirmation",
-      htmlBody: [
-        `<p>Dear ${escapeHtml(data.name || "guest")},</p>`,
-        "<p>Thank you for responding to our wedding invitation.</p>",
-        `<p><strong>Attendance:</strong> ${escapeHtml(data.attendance || "Not specified")}<br>` +
-          `<strong>Guests:</strong> ${escapeHtml(String(data.guests || "1"))}<br>` +
-          `<strong>Meal preference:</strong> ${escapeHtml(data.meal || "Not specified")}</p>`,
-        "<p>We look forward to celebrating with you.</p>",
-      ].join(""),
-    })
+    try {
+      MailApp.sendEmail({
+        to: data.email,
+        subject: "RSVP confirmation",
+        htmlBody: [
+          `<p>Dear ${escapeHtml(data.name || "guest")},</p>`,
+          "<p>Thank you for responding to our wedding invitation.</p>",
+          `<p><strong>Attendance:</strong> ${escapeHtml(data.attendance || "Not specified")}<br>` +
+            `<strong>Guests:</strong> ${escapeHtml(String(data.guests || "1"))}<br>` +
+            `<strong>Meal preference:</strong> ${escapeHtml(data.meal || "Not specified")}</p>`,
+          "<p>We look forward to celebrating with you.</p>",
+        ].join(""),
+      })
+    } catch (error) {
+      console.error(`RSVP saved, but confirmation email failed: ${error}`)
+    }
   }
 
   return ContentService
