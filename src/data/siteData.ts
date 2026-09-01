@@ -1,6 +1,9 @@
-import heroPhoto from "@/imports/cda69251-0cda-4945-bb14-314d33e6b53b.jpg"
-import photoColor from "@/imports/fea8cf50-57b0-49fb-a259-3f6e655716c8.jpg"
-import photoBW from "@/imports/baeb4bd6-b687-4114-84d6-8552788cbfc7.jpg"
+const imagePath = (filename: string) =>
+  `${import.meta.env.BASE_URL}imports/${filename}`
+
+const heroPhoto = imagePath("cda69251-0cda-4945-bb14-314d33e6b53b.jpg")
+const photoColor = imagePath("fea8cf50-57b0-49fb-a259-3f6e655716c8.jpg")
+const photoBW = imagePath("baeb4bd6-b687-4114-84d6-8552788cbfc7.jpg")
 
 export const P = {
   burgundy: "#7B2937",

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
-import heroPhoto from "@/imports/cda69251-0cda-4945-bb14-314d33e6b53b.jpg"
-import { P } from "../data/siteData"
+import { COUPLE_PHOTOS, P } from "../data/siteData"
+
+const heroPhoto = COUPLE_PHOTOS[2].src
 
 function useCountdown(targetDate: string) {
   const calc = () => {
