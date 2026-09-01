@@ -338,7 +338,7 @@ export function RSVP() {
                     Guest names will appear here
                   </span>
                 )}
-
+              </div>
               {/* Single Merged Attendance Dropdown */}
               <div className={fieldWrapClass} style={fieldStyle}>
                 <select
@@ -362,8 +362,6 @@ export function RSVP() {
                   ⌄
                 </span>
               </div>
-              </div>
-
               <textarea
                 value={form.message}
                 disabled={!isUnlocked}
