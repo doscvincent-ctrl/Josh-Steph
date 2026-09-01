@@ -4,6 +4,7 @@ import { fetchInvitees, type Invitee, P } from "../data/siteData"
 type RSVPForm = {
   code: string
   attendance: string
+  guestCount: number
   message: string
 }
 
@@ -38,7 +39,7 @@ export function RSVP() {
   const [invitees, setInvitees] = useState<Invitee[]>([])
   const [isLoadingInvitees, setIsLoadingInvitees] = useState(true)
   const [loadFailed, setLoadFailed] = useState(false)
-  const [form, setForm] = useState<RSVPForm>({ code: "", attendance: "", message: "" })
+  const [form, setForm] = useState<RSVPForm>({ code: "", attendance: "", guestCount: 1, message: "" })
   const [submitted, setSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
@@ -81,6 +82,9 @@ export function RSVP() {
     )
   }, [invitees, trimmedCode])
 
+  const maxGuests = matchedInvitee?.maxGuests ?? 1
+  const isPartyCode = maxGuests > 1
+
   const codeStatus: "empty" | "checking" | "unavailable" | "valid" | "invalid" = isLoadingInvitees
     ? "checking"
     : loadFailed
@@ -92,6 +96,14 @@ export function RSVP() {
           : "invalid"
 
   const isUnlocked = codeStatus === "valid"
+
+  // Whenever a new code matches, default the guest-count selector to
+  // "everyone in the party" rather than making people count themselves.
+  useEffect(() => {
+    if (matchedInvitee) {
+      setForm((current) => ({ ...current, guestCount: matchedInvitee.maxGuests ?? 1 }))
+    }
+  }, [matchedInvitee])
 
   const handleCodeChange = (value: string) => {
     setErrorMessage("")
@@ -121,6 +133,11 @@ export function RSVP() {
       return
     }
 
+    if (form.attendance === "yes" && (form.guestCount < 1 || form.guestCount > maxGuests)) {
+      setErrorMessage(`Please choose between 1 and ${maxGuests} guests.`)
+      return
+    }
+
     setIsSubmitting(true)
     setErrorMessage("")
 
@@ -128,6 +145,7 @@ export function RSVP() {
       await submitRSVP({
         guestId: matchedInvitee.id,
         attendance: form.attendance,
+        guestCount: String(form.attendance === "yes" ? form.guestCount : 0),
         message: form.message,
       })
       setSubmitted(true)
@@ -190,7 +208,9 @@ export function RSVP() {
               Thank you, {matchedInvitee?.name}!
             </h3>
             <p className="text-sm leading-relaxed" style={{ color: P.burgundyDk }}>
-              We have received your RSVP and look forward to celebrating with you.
+              {form.attendance === "yes"
+                ? `We've saved your RSVP for ${form.guestCount} guest${form.guestCount === 1 ? "" : "s"} and look forward to celebrating with you.`
+                : "We've received your response and are sorry you can't make it."}
             </p>
           </div>
         ) : (
@@ -227,6 +247,12 @@ export function RSVP() {
               </p>
             )}
 
+            {isUnlocked && isPartyCode && (
+              <p className="mt-1.5 text-xs" style={{ color: P.burgundyDk }}>
+                This invite covers up to {maxGuests} guests.
+              </p>
+            )}
+
             {/* Step 2: everything below only opens up once a code matches */}
             <div
               className={`mt-3 space-y-3 transition-opacity ${
@@ -250,11 +276,34 @@ export function RSVP() {
                   className={`${fieldClass} appearance-none`}
                 >
                   <option value="">Will you attend?</option>
-                  <option value="yes">Yes, I will attend</option>
-                  <option value="no">No, I can&apos;t attend</option>
+                  <option value="yes">Yes, we will attend</option>
+                  <option value="no">No, we can&apos;t attend</option>
                 </select>
                 <span className="text-base" style={{ color: P.black }}>⌄</span>
               </div>
+
+              {/* Only shown for a code that covers more than one guest,
+                  and only meaningful once they've said they're coming. */}
+              {isPartyCode && form.attendance === "yes" && (
+                <div className={fieldWrapClass} style={fieldStyle}>
+                  <select
+                    value={form.guestCount}
+                    disabled={!isUnlocked}
+                    onChange={(event) => {
+                      setErrorMessage("")
+                      setForm((current) => ({ ...current, guestCount: Number(event.target.value) }))
+                    }}
+                    className={`${fieldClass} appearance-none`}
+                  >
+                    {Array.from({ length: maxGuests }, (_, i) => i + 1).map((count) => (
+                      <option key={count} value={count}>
+                        {count} guest{count === 1 ? "" : "s"} attending
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-base" style={{ color: P.black }}>⌄</span>
+                </div>
+              )}
 
               <textarea
                 value={form.message}
