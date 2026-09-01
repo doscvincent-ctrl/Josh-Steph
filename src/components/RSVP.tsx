@@ -4,7 +4,7 @@ import { fetchInvitees, type Invitee, P } from "../data/siteData"
 type RSVPForm = {
   code: string
   attendance: string
-  attendingGuests: boolean[]
+  guestCount: number
   message: string
 }
 
@@ -21,8 +21,6 @@ async function submitRSVP(payload: Record<string, string>) {
     body: new URLSearchParams(payload),
   })
 
-  // no-cors responses are opaque — we can't read status/body, so we
-  // optimistically treat a completed request as success.
   if (response.type === "opaque") {
     return { ok: true, message: "RSVP recorded successfully." }
   }
@@ -42,7 +40,7 @@ export function RSVP() {
   const [form, setForm] = useState<RSVPForm>({
     code: "",
     attendance: "",
-    attendingGuests: [],
+    guestCount: 0,
     message: "",
   })
   const [submitted, setSubmitted] = useState(false)
@@ -74,8 +72,6 @@ export function RSVP() {
 
   const trimmedCode = form.code.trim()
 
-  // The sheet is row-based: every person is a row, and people in the same
-  // invitation share the same Code. fetchInvitees groups those rows for us.
   const matchedParty = useMemo(() => {
     if (!trimmedCode) return null
 
@@ -87,6 +83,7 @@ export function RSVP() {
   }, [invitees, trimmedCode])
 
   const names = matchedParty?.map((invitee) => invitee.name) ?? []
+  const maxGuests = matchedParty?.length ?? 0
   const isUnlocked = !!matchedParty
 
   const codeStatus: "empty" | "checking" | "unavailable" | "valid" | "invalid" =
@@ -102,18 +99,18 @@ export function RSVP() {
 
   useEffect(() => {
     if (matchedParty) {
+      // Calculate how many were marked 'yes' originally, or default to max party count
+      const initialCount = matchedParty.filter((inv) => inv.attendance === "yes").length
       setForm((current) => ({
         ...current,
         attendance: "",
-        attendingGuests: matchedParty.map(
-          (invitee) => invitee.attendance === "yes",
-        ),
+        guestCount: initialCount > 0 ? initialCount : matchedParty.length,
       }))
     } else {
       setForm((current) => ({
         ...current,
         attendance: "",
-        attendingGuests: [],
+        guestCount: 0,
       }))
     }
   }, [matchedParty])
@@ -124,31 +121,22 @@ export function RSVP() {
     setForm((current) => ({ ...current, code: value }))
   }
 
-  const toggleGuest = (index: number) => {
-    setErrorMessage("")
-
-    setForm((current) => {
-      const attendingGuests = [...current.attendingGuests]
-      attendingGuests[index] = !attendingGuests[index]
-
-      return {
-        ...current,
-        attendance: attendingGuests.some(Boolean) ? "yes" : "",
-        attendingGuests,
-      }
-    })
-  }
-
   const handleAttendanceChange = (value: string) => {
     setErrorMessage("")
 
     setForm((current) => ({
       ...current,
       attendance: value,
-      attendingGuests:
-        value === "no"
-          ? current.attendingGuests.map(() => false)
-          : current.attendingGuests,
+      guestCount: value === "no" ? 0 : current.guestCount || maxGuests,
+    }))
+  }
+
+  const handleGuestCountChange = (count: number) => {
+    setErrorMessage("")
+    setForm((current) => ({
+      ...current,
+      guestCount: count,
+      attendance: count > 0 ? "yes" : current.attendance,
     }))
   }
 
@@ -171,15 +159,12 @@ export function RSVP() {
     }
 
     if (!form.attendance) {
-      setErrorMessage("Please let us know who will be attending.")
+      setErrorMessage("Please let us know if you will be attending.")
       return
     }
 
-    if (
-      form.attendance === "yes" &&
-      !form.attendingGuests.some(Boolean)
-    ) {
-      setErrorMessage("Please check off at least one guest who will be attending.")
+    if (form.attendance === "yes" && form.guestCount <= 0) {
+      setErrorMessage("Please select at least 1 guest attending.")
       return
     }
 
@@ -187,17 +172,17 @@ export function RSVP() {
     setErrorMessage("")
 
     try {
+      // Mark up to `guestCount` guests as attending to match the payload structure expected by Google Apps Script
+      const attendingGuestsPayload = matchedParty.map((invitee, index) => ({
+        name: invitee.name,
+        email: invitee.email,
+        attending: form.attendance === "yes" && index < form.guestCount,
+      }))
+
       await submitRSVP({
         guestId: matchedParty[0].id,
         attendance: form.attendance,
-        attendingGuests: JSON.stringify(
-          matchedParty.map((invitee, index) => ({
-            name: invitee.name,
-            email: invitee.email,
-            attending:
-              form.attendance === "yes" && !!form.attendingGuests[index],
-          })),
-        ),
+        attendingGuests: JSON.stringify(attendingGuestsPayload),
         message: form.message,
       })
 
@@ -327,44 +312,7 @@ export function RSVP() {
                   : "pointer-events-none opacity-40"
               }`}
             >
-              <div
-                className="rounded-lg border px-4 py-3"
-                style={fieldStyle}
-              >
-                <p
-                  className="mb-2 text-xs uppercase tracking-[0.12em]"
-                  style={{ color: P.burgundyDk }}
-                >
-                  Guests
-                </p>
-
-                {matchedParty ? (
-                  <div className="space-y-1">
-                    {matchedParty.map((invitee, index) => (
-                      <label
-                        key={`${invitee.id}-${index}-${invitee.name}`}
-                        className="flex cursor-pointer items-center gap-3 rounded-md px-1 py-2"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={!!form.attendingGuests[index]}
-                          disabled={!isUnlocked || form.attendance === "no"}
-                          onChange={() => toggleGuest(index)}
-                          className="h-4 w-4"
-                        />
-                        <span className="text-[0.95rem]">
-                          {invitee.name}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="text-[0.95rem]">
-                    Guest names will appear here
-                  </span>
-                )}
-              </div>
-
+              {/* Attendance Status */}
               <div className={fieldWrapClass} style={fieldStyle}>
                 <select
                   value={form.attendance}
@@ -383,11 +331,47 @@ export function RSVP() {
                 </span>
               </div>
 
-              {matchedParty && matchedParty.length > 1 && form.attendance === "yes" && (
-                <p className="text-xs" style={{ color: P.burgundyDk }}>
-                  Please check the names of everyone who will be attending.
-                </p>
+              {/* Guest Count Dropdown */}
+              {form.attendance === "yes" && maxGuests > 0 && (
+                <div className={fieldWrapClass} style={fieldStyle}>
+                  <select
+                    value={form.guestCount}
+                    disabled={!isUnlocked}
+                    onChange={(event) =>
+                      handleGuestCountChange(Number(event.target.value))
+                    }
+                    className={`${fieldClass} appearance-none`}
+                  >
+                    {Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
+                      <option key={num} value={num}>
+                        {num} {num === 1 ? "guest" : "guests"} attending
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-base" style={{ color: P.black }}>
+                    ⌄
+                  </span>
+                </div>
               )}
+
+              {/* Names linked to code list display */}
+              <div className="rounded-lg border px-4 py-3" style={fieldStyle}>
+                <p
+                  className="mb-1 text-xs uppercase tracking-[0.12em]"
+                  style={{ color: P.burgundyDk }}
+                >
+                  Invited Party
+                </p>
+                {matchedParty ? (
+                  <p className="text-[0.9rem] opacity-80">
+                    {names.join(", ")}
+                  </p>
+                ) : (
+                  <span className="text-[0.95rem]">
+                    Guest names will appear here
+                  </span>
+                )}
+              </div>
 
               <textarea
                 value={form.message}
