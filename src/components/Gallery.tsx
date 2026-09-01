@@ -3,6 +3,16 @@ import { COUPLE_PHOTOS, P } from "../data/siteData"
 
 export function Gallery() {
   const [active, setActive] = useState<number | null>(null)
+  const [orientations, setOrientations] = useState<
+    Record<string, "portrait" | "landscape">
+  >({})
+
+  const setOrientation = (src: string, image: HTMLImageElement) => {
+    setOrientations((current) => ({
+      ...current,
+      [src]: image.naturalHeight > image.naturalWidth ? "portrait" : "landscape",
+    }))
+  }
 
   return (
     <section
@@ -10,7 +20,7 @@ export function Gallery() {
       className="py-28 px-4"
       style={{ background: P.champagne }}
     >
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <p
             className="font-script italic text-lg mb-2"
@@ -34,40 +44,22 @@ export function Gallery() {
           </div>
         </div>
 
-        <div className="gallery-grid grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div
-            className="gallery-item cursor-pointer sm:row-span-2"
-            style={{ backgroundColor: P.burgundy }}
-            onClick={() => setActive(0)}
-          >
-            <img
-              src={COUPLE_PHOTOS[0].src}
-              alt={COUPLE_PHOTOS[0].alt}
-              className="w-full h-full object-cover object-top"
-            />
-          </div>
-          <div
-            className="gallery-item cursor-pointer"
-            style={{ backgroundColor: P.burgundy }}
-            onClick={() => setActive(1)}
-          >
-            <img
-              src={COUPLE_PHOTOS[1].src}
-              alt={COUPLE_PHOTOS[1].alt}
-              className="w-full h-full object-cover object-top"
-            />
-          </div>
-          <div
-            className="gallery-item cursor-pointer"
-            style={{ backgroundColor: P.burgundy }}
-            onClick={() => setActive(2)}
-          >
-            <img
-              src={COUPLE_PHOTOS[2].src}
-              alt={COUPLE_PHOTOS[2].alt}
-              className="w-full h-full object-cover object-center"
-            />
-          </div>
+        <div className="gallery-grid">
+          {COUPLE_PHOTOS.map((photo, index) => (
+            <div
+              key={photo.src}
+              className={`gallery-item gallery-item--${orientations[photo.src] || "landscape"} gallery-item--variant-${index % 5} cursor-pointer`}
+              style={{ backgroundColor: P.burgundy }}
+              onClick={() => setActive(index)}
+            >
+              <img
+                src={photo.src}
+                alt={photo.alt}
+                className="w-full h-full object-cover object-top"
+                onLoad={(event) => setOrientation(photo.src, event.currentTarget)}
+              />
+            </div>
+          ))}
         </div>
 
         {active !== null && (

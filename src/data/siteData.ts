@@ -2,9 +2,11 @@ const imagePath = (filename: string) =>
   `${import.meta.env.BASE_URL}imports/${filename}`
 
 const heroPhoto = imagePath("cda69251-0cda-4945-bb14-314d33e6b53b.jpg")
-const photoBW = imagePath("baeb4bd6-b687-4114-84d6-8552788cbfc7.jpg")
-const peek = imagePath("42b119ee-6746-493e-b7cd-5e005fe3200a.jpg")
-const look = imagePath("9218f1bc-88aa-48f7-b723-5d85ff73564e.jpg")
+
+const importedImages = import.meta.glob(
+  "../imports/*.{jpg,jpeg,png,webp}",
+  { eager: true, query: "?url", import: "default" },
+) as Record<string, string>
 
 export const P = {
   burgundy: "#7B2937",
@@ -16,12 +18,16 @@ export const P = {
   black: "#1A1A1A",
 }
 
-export const COUPLE_PHOTOS = [
-  { src: photoBW, alt: "Josh and Steph holding hands — black and white" },
-  { src: heroPhoto, alt: "Josh and Steph holding up their childhood photos" },
-  { src: peek, alt: "Josh and Steph peek" },
-  { src: look, alt: "Josh and Steph staring" },
-]
+export const COUPLE_PHOTOS = Object.entries(importedImages)
+  .sort(([first], [second]) => first.localeCompare(second))
+  .map(([path, src]) => {
+    const filename = path.split("/").pop()?.replace(/\.[^.]+$/, "") || "photo"
+    const alt = filename
+      .replace(/[-_]+/g, " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase())
+
+    return { src, alt: `Josh and Steph ${alt}` }
+  })
 
 export const STORY = [
   {
