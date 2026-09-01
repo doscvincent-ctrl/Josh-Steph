@@ -28,7 +28,7 @@ export function Details() {
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 gap-6">
           {DETAILS.map((d) => (
             <div
               key={d.label}
