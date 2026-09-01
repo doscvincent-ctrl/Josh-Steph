@@ -56,16 +56,16 @@ export const DETAILS = [
   {
     icon: "♡",
     label: "Ceremony",
-    line1: "February 5, 2027 · 4:00 PM",
-    line2: "The Grand Ballroom",
+    line1: "February 5, 2027 · 3:00 PM",
+    line2: "TFruella’s Events Place",
     line3: "Tagaytay City, Philippines",
   },
   {
     icon: "◇",
     label: "Reception",
-    line1: "February 5, 2027 · 7:00 PM",
-    line2: "Rosewood Gardens",
-    line3: "Cocktails, Dinner & Dancing",
+    line1: "February 5, 2027 · 5:00 PM",
+    line2: "Fruella’s Events Place",
+    line3: "Tagaytay City, Philippines",
   },
   {
     icon: "◈",

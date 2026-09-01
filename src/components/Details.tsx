@@ -87,10 +87,10 @@ export function Details() {
             Location
           </p>
           <p className="font-display text-white/80 text-sm">
-            Tagaytay City · Cavite · Philippines
+            Fruella’s Events Place Tagaytay
           </p>
           <a
-            href="https://maps.google.com/?q=Tagaytay+City+Philippines"
+            href="https://www.google.com/maps/place/Fruella's+Events+Venue+Tagaytay/@14.1327979,120.9289331,17z/data=!3m1!4b1!4m6!3m5!1s0x33bd796d1fd7f119:0x5fccd52277bc6f1!8m2!3d14.1327979!4d120.931508!16s%2Fg%2F11v0gyk507?entry=ttu&g_ep=EgoyMDI2MDgyNi4wIKXMDSoASAFQAw%3D%3D"
             target="_blank"
             rel="noreferrer"
             className="inline-block mt-4 text-xs tracking-[0.2em] uppercase pb-0.5 transition-colors"
