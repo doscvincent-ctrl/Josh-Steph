@@ -14,7 +14,10 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        assetFileNames: 'assets/[name][extname]',
+        assetFileNames: (assetInfo) =>
+          assetInfo.name?.toLowerCase().endsWith('.jpg')
+            ? 'imports/[name][extname]'
+            : 'assets/[name][extname]',
         entryFileNames: 'assets/app.js',
         chunkFileNames: 'assets/[name].js',
       },
