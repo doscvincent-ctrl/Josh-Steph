@@ -15,7 +15,9 @@ function doPost(e) {
   const sheet = spreadsheet.getSheetByName(SHEET_NAME) || spreadsheet.insertSheet(SHEET_NAME)
   ensureHeaders(sheet)
 
-  const data = JSON.parse(e.postData.contents)
+  const data = e.parameter && e.parameter.name
+    ? e.parameter
+    : JSON.parse(e.postData.contents)
   sheet.appendRow([
     data.createdAt || new Date().toISOString(),
     data.name || "",

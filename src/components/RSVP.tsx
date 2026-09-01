@@ -23,13 +23,18 @@ async function submitRSVP(form: RSVPForm) {
     return { ok: true, message: "Local demo mode: RSVP saved in memory." }
   }
 
+  const body = new URLSearchParams({
+    ...payload,
+    guestCount: String(payload.guestCount),
+  })
+
   const response = await fetch(SHEETS_URL, {
     method: "POST",
     mode: "no-cors",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
     },
-    body: JSON.stringify(payload),
+    body,
   })
 
   if (response.type === "opaque") {
