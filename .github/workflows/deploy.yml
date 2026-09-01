@@ -35,6 +35,9 @@ jobs:
         env:
           VITE_SHEETS_WEB_APP_URL: ${{ secrets.VITE_SHEETS_WEB_APP_URL }}
 
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
