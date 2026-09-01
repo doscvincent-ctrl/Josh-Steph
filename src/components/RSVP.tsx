@@ -129,8 +129,11 @@ export function RSVP() {
         attendance: "no",
         guestCount: 0,
       }))
-    } else if (value.startsWith("yes-")) {
-      const count = Number(value.replace("yes-", ""))
+    } else if (value.startsWith("yes")) {
+      const count = value.includes("-")
+        ? Number(value.replace("yes-", ""))
+        : 1
+
       setForm((current) => ({
         ...current,
         attendance: "yes",
@@ -207,12 +210,13 @@ export function RSVP() {
     color: P.black,
   }
 
-  // Helper value calculation for the merged dropdown
   const selectedDropdownValue =
     form.attendance === "no"
       ? "no"
       : form.attendance === "yes"
-        ? `yes-${form.guestCount}`
+        ? maxGuests === 1
+          ? "yes"
+          : `yes-${form.guestCount}`
         : ""
 
   return (
@@ -319,6 +323,39 @@ export function RSVP() {
                   : "pointer-events-none opacity-40"
               }`}
             >
+              {/* Conditional Attendance Dropdown */}
+              <div className={fieldWrapClass} style={fieldStyle}>
+                <select
+                  value={selectedDropdownValue}
+                  disabled={!isUnlocked}
+                  onChange={(event) =>
+                    handleSelectionChange(event.target.value)
+                  }
+                  className={`${fieldClass} appearance-none`}
+                >
+                  <option value="">Will you attend?</option>
+                  
+                  {maxGuests === 1 ? (
+                    <>
+                      <option value="yes">Yes, I am attending</option>
+                      <option value="no">No, I am not attending</option>
+                    </>
+                  ) : (
+                    <>
+                      {Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
+                        <option key={num} value={`yes-${num}`}>
+                          {num} {num === 1 ? "guest" : "guests"} attending
+                        </option>
+                      ))}
+                      <option value="no">No, we can't attend</option>
+                    </>
+                  )}
+                </select>
+                <span className="text-base" style={{ color: P.black }}>
+                  ⌄
+                </span>
+              </div>
+
               {/* Names linked to code list display (stacked line by line) */}
               <div className="rounded-lg border px-4 py-3" style={fieldStyle}>
                 <p
@@ -339,29 +376,7 @@ export function RSVP() {
                   </span>
                 )}
               </div>
-              {/* Single Merged Attendance Dropdown */}
-              <div className={fieldWrapClass} style={fieldStyle}>
-                <select
-                  value={selectedDropdownValue}
-                  disabled={!isUnlocked}
-                  onChange={(event) =>
-                    handleSelectionChange(event.target.value)
-                  }
-                  className={`${fieldClass} appearance-none`}
-                >
-                  <option value="">Will you attend?</option>
-                  {maxGuests > 0 &&
-                    Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => (
-                      <option key={num} value={`yes-${num}`}>
-                        {num} {num === 1 ? "guest" : "guests"} attending
-                      </option>
-                    ))}
-                  <option value="no">No, we can't attend</option>
-                </select>
-                <span className="text-base" style={{ color: P.black }}>
-                  ⌄
-                </span>
-              </div>
+
               <textarea
                 value={form.message}
                 disabled={!isUnlocked}
