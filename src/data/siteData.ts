@@ -75,3 +75,144 @@ export const DETAILS = [
     line3: "Celebrate in elegance",
   },
 ]
+
+export type Invitee = {
+  id: string
+  name: string
+  email: string
+  maxGuests?: number
+  attendance?: string // "yes" | "no" | "" — reflects the Attendance column on the sheet
+}
+
+function normalizeInvitee(raw: Record<string, unknown>, index: number): Invitee | null {
+  const lookup = Object.entries(raw).reduce<Record<string, unknown>>((acc, [key, value]) => {
+    const normalizedKey = key
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "")
+
+    acc[normalizedKey] = value
+    return acc
+  }, {})
+
+  const name = String(
+    lookup.name ??
+      lookup.fullname ??
+      lookup.guestname ??
+      lookup.fullnameaslisted ??
+      lookup.attendee ??
+      lookup.invitee ??
+      "",
+  ).trim()
+
+  const email = String(
+    lookup.email ?? lookup.emailaddress ?? lookup.guestemail ?? lookup.attendeeemail ?? "",
+  ).trim()
+
+  // The guest-facing identifier is the "Code" column on the Invitees
+  // sheet. We still fall back to older aliases (id/slug/etc.) so
+  // existing sheets keep working without a rename.
+  const idValue = String(
+    lookup.code ??
+      lookup.guestcode ??
+      lookup.invitecode ??
+      lookup.id ??
+      lookup.inviteid ??
+      lookup.inviteeid ??
+      lookup.guestid ??
+      lookup.slug ??
+      lookup.linkid ??
+      "",
+  ).trim()
+
+  const rawGuestCount = Number(
+    lookup.maxguests ??
+      lookup.guests ??
+      lookup.guestcount ??
+      lookup.maxguestcount ??
+      lookup.seats ??
+      1,
+  )
+  const maxGuests = Number.isFinite(rawGuestCount) && rawGuestCount > 0 ? rawGuestCount : 1
+
+  const attendance = String(lookup.attendance ?? "").trim().toLowerCase()
+
+  if (!name && !email) return null
+
+  // A row with no code isn't a valid invitee for this flow — RSVP is
+  // strictly code-gated, so skip rows that can't be looked up by code.
+  if (!idValue) return null
+
+  return {
+    id: idValue,
+    name: name || "Guest",
+    email: email || "guest@example.com",
+    maxGuests,
+    attendance: attendance === "yes" || attendance === "no" ? attendance : "",
+  }
+}
+
+export async function fetchInvitees(): Promise<Invitee[]> {
+  const sheetUrl = import.meta.env.VITE_SHEETS_WEB_APP_URL as string | undefined
+
+  // No sheet configured — there's no fallback list anymore, so RSVP
+  // stays locked for everyone until VITE_SHEETS_WEB_APP_URL is set.
+  if (!sheetUrl) {
+    return []
+  }
+
+  const candidateUrls = [
+    `${sheetUrl}?action=invitees`,
+    `${sheetUrl}?action=guests`,
+    sheetUrl,
+  ]
+
+  for (const candidateUrl of candidateUrls) {
+    try {
+      const response = await fetch(candidateUrl)
+      if (!response.ok) continue
+
+      const text = await response.text()
+      if (!text) continue
+
+      const parsed = JSON.parse(text) as unknown
+      const rows = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray((parsed as { invitees?: unknown })?.invitees)
+          ? (parsed as { invitees: unknown[] }).invitees
+          : Array.isArray((parsed as { data?: unknown[] })?.data)
+            ? (parsed as { data: unknown[] }).data
+            : Array.isArray((parsed as { rows?: unknown[] })?.rows)
+              ? (parsed as { rows: unknown[] }).rows
+              : []
+
+      const invitees = rows
+        .map((row) =>
+          typeof row === "object" && row !== null
+            ? normalizeInvitee(row as Record<string, unknown>, rows.indexOf(row))
+            : null,
+        )
+        .filter((item): item is Invitee => item !== null)
+
+      if (invitees.length > 0) {
+        return invitees
+      }
+    } catch {
+      // Ignore failed fetches and continue to the next URL.
+    }
+  }
+
+  return []
+}
+
+export function buildInviteLink(inviteeId: string) {
+  if (typeof window === "undefined") {
+    return `/?invite=${encodeURIComponent(inviteeId)}#rsvp`
+  }
+
+  const url = new URL(window.location.href)
+  url.searchParams.set("invite", inviteeId)
+  url.hash = "rsvp"
+
+  return url.toString()
+}
