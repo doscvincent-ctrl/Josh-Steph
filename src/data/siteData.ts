@@ -55,18 +55,18 @@ export const STORY = [
 export const DETAILS = [
   {
     icon: "♡",
-    label: "Ceremony",
+    label: "Ceremony & Reception",
     line1: "February 5, 2027 · 3:00 PM",
     line2: "Fruella’s Events Place",
     line3: "Tagaytay City, Philippines",
   },
-  {
-    icon: "◇",
-    label: "Reception",
-    line1: "February 5, 2027 · 5:00 PM",
-    line2: "Fruella’s Events Place",
-    line3: "Tagaytay City, Philippines",
-  },
+  // {
+  //   icon: "◇",
+  //   label: "Reception",
+  //   line1: "February 5, 2027 · 5:00 PM",
+  //   line2: "Fruella’s Events Place",
+  //   line3: "Tagaytay City, Philippines",
+  // },
   {
     icon: "◈",
     label: "Dress Code",
