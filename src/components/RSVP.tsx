@@ -74,17 +74,20 @@ export function RSVP() {
 
   const trimmedCode = form.code.trim()
 
-  const matchedInvitee: Invitee | null = useMemo(() => {
+  // The sheet is row-based: every person is a row, and people in the same
+  // invitation share the same Code. fetchInvitees groups those rows for us.
+  const matchedParty = useMemo(() => {
     if (!trimmedCode) return null
-    return (
-      invitees.find(
-        (invitee) => invitee.id.toLowerCase() === trimmedCode.toLowerCase(),
-      ) ?? null
+
+    const matchingRows = invitees.filter(
+      (invitee) => invitee.id.toLowerCase() === trimmedCode.toLowerCase(),
     )
+
+    return matchingRows.length > 0 ? matchingRows : null
   }, [invitees, trimmedCode])
 
-  const names = matchedInvitee?.names ?? []
-  const hasMultipleGuests = names.length > 1
+  const names = matchedParty?.map((invitee) => invitee.name) ?? []
+  const isUnlocked = !!matchedParty
 
   const codeStatus: "empty" | "checking" | "unavailable" | "valid" | "invalid" =
     isLoadingInvitees
@@ -93,21 +96,27 @@ export function RSVP() {
         ? "unavailable"
         : !trimmedCode
           ? "empty"
-          : matchedInvitee
+          : matchedParty
             ? "valid"
             : "invalid"
 
-  const isUnlocked = codeStatus === "valid"
-
   useEffect(() => {
-    if (matchedInvitee) {
+    if (matchedParty) {
       setForm((current) => ({
         ...current,
         attendance: "",
-        attendingGuests: matchedInvitee.names.map(() => false),
+        attendingGuests: matchedParty.map(
+          (invitee) => invitee.attendance === "yes",
+        ),
+      }))
+    } else {
+      setForm((current) => ({
+        ...current,
+        attendance: "",
+        attendingGuests: [],
       }))
     }
-  }, [matchedInvitee])
+  }, [matchedParty])
 
   const handleCodeChange = (value: string) => {
     setErrorMessage("")
@@ -117,9 +126,11 @@ export function RSVP() {
 
   const toggleGuest = (index: number) => {
     setErrorMessage("")
+
     setForm((current) => {
       const attendingGuests = [...current.attendingGuests]
       attendingGuests[index] = !attendingGuests[index]
+
       return {
         ...current,
         attendance: attendingGuests.some(Boolean) ? "yes" : "",
@@ -154,7 +165,7 @@ export function RSVP() {
       return
     }
 
-    if (!matchedInvitee) {
+    if (!matchedParty) {
       setErrorMessage("That code isn't on our guest list. Please double-check your invitation.")
       return
     }
@@ -166,7 +177,6 @@ export function RSVP() {
 
     if (
       form.attendance === "yes" &&
-      names.length > 0 &&
       !form.attendingGuests.some(Boolean)
     ) {
       setErrorMessage("Please check off at least one guest who will be attending.")
@@ -178,18 +188,15 @@ export function RSVP() {
 
     try {
       await submitRSVP({
-        guestId: matchedInvitee.id,
+        guestId: matchedParty[0].id,
         attendance: form.attendance,
         attendingGuests: JSON.stringify(
-          names.map((name, index) => ({
-            name,
-            attending: form.attendance === "yes" && !!form.attendingGuests[index],
+          matchedParty.map((invitee, index) => ({
+            name: invitee.name,
+            email: invitee.email,
+            attending:
+              form.attendance === "yes" && !!form.attendingGuests[index],
           })),
-        ),
-        guestCount: String(
-          form.attendance === "yes"
-            ? form.attendingGuests.filter(Boolean).length
-            : 0,
         ),
         message: form.message,
       })
@@ -228,7 +235,11 @@ export function RSVP() {
           </p>
           <h2
             className="font-display mt-2"
-            style={{ fontSize: "clamp(2rem, 5vw, 3rem)", lineHeight: 1.05, color: P.black }}
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3rem)",
+              lineHeight: 1.05,
+              color: P.black,
+            }}
           >
             Join Our Special Day
           </h2>
@@ -250,10 +261,16 @@ export function RSVP() {
             <div className="text-3xl mb-3" style={{ color: P.burgundy }}>
               ♡
             </div>
-            <h3 className="font-display text-2xl mb-2" style={{ color: P.black }}>
+            <h3
+              className="font-display text-2xl mb-2"
+              style={{ color: P.black }}
+            >
               Thank you, {names[0] ?? "Guest"}!
             </h3>
-            <p className="text-sm leading-relaxed" style={{ color: P.burgundyDk }}>
+            <p
+              className="text-sm leading-relaxed"
+              style={{ color: P.burgundyDk }}
+            >
               {form.attendance === "yes"
                 ? "We've saved your RSVP and look forward to celebrating with you."
                 : "We've received your response and are sorry you can't make it."}
@@ -289,7 +306,10 @@ export function RSVP() {
             )}
 
             {codeStatus === "checking" && (
-              <p className="mt-1.5 text-xs opacity-60" style={{ color: P.black }}>
+              <p
+                className="mt-1.5 text-xs opacity-60"
+                style={{ color: P.black }}
+              >
                 Loading guest list...
               </p>
             )}
@@ -302,35 +322,45 @@ export function RSVP() {
 
             <div
               className={`mt-3 space-y-3 transition-opacity ${
-                isUnlocked ? "opacity-100" : "pointer-events-none opacity-40"
+                isUnlocked
+                  ? "opacity-100"
+                  : "pointer-events-none opacity-40"
               }`}
             >
-              <div className="rounded-lg border px-4 py-3" style={fieldStyle}>
-                <p className="mb-2 text-xs uppercase tracking-[0.12em]" style={{ color: P.burgundyDk }}>
+              <div
+                className="rounded-lg border px-4 py-3"
+                style={fieldStyle}
+              >
+                <p
+                  className="mb-2 text-xs uppercase tracking-[0.12em]"
+                  style={{ color: P.burgundyDk }}
+                >
                   Guests
                 </p>
 
-                {names.length > 0 ? (
-                  <div className="space-y-2">
-                    {names.map((name, index) => (
+                {matchedParty ? (
+                  <div className="space-y-1">
+                    {matchedParty.map((invitee, index) => (
                       <label
-                        key={`${name}-${index}`}
-                        className="flex cursor-pointer items-center gap-3 rounded-md px-1 py-1.5"
+                        key={`${invitee.id}-${index}-${invitee.name}`}
+                        className="flex cursor-pointer items-center gap-3 rounded-md px-1 py-2"
                       >
                         <input
                           type="checkbox"
                           checked={!!form.attendingGuests[index]}
                           disabled={!isUnlocked || form.attendance === "no"}
                           onChange={() => toggleGuest(index)}
-                          className="h-4 w-4 accent-[#7B2937]"
+                          className="h-4 w-4"
                         />
-                        <span className="text-[0.95rem]">{name}</span>
+                        <span className="text-[0.95rem]">
+                          {invitee.name}
+                        </span>
                       </label>
                     ))}
                   </div>
                 ) : (
                   <span className="text-[0.95rem]">
-                    Guest name will appear here
+                    Guest names will appear here
                   </span>
                 )}
               </div>
@@ -339,7 +369,9 @@ export function RSVP() {
                 <select
                   value={form.attendance}
                   disabled={!isUnlocked}
-                  onChange={(event) => handleAttendanceChange(event.target.value)}
+                  onChange={(event) =>
+                    handleAttendanceChange(event.target.value)
+                  }
                   className={`${fieldClass} appearance-none`}
                 >
                   <option value="">Will you attend?</option>
@@ -351,9 +383,9 @@ export function RSVP() {
                 </span>
               </div>
 
-              {hasMultipleGuests && form.attendance === "yes" && (
+              {matchedParty && matchedParty.length > 1 && form.attendance === "yes" && (
                 <p className="text-xs" style={{ color: P.burgundyDk }}>
-                  Check the names of everyone who will be attending.
+                  Please check the names of everyone who will be attending.
                 </p>
               )}
 
@@ -362,7 +394,10 @@ export function RSVP() {
                 disabled={!isUnlocked}
                 onChange={(event) => {
                   setErrorMessage("")
-                  setForm((current) => ({ ...current, message: event.target.value }))
+                  setForm((current) => ({
+                    ...current,
+                    message: event.target.value,
+                  }))
                 }}
                 placeholder="Message"
                 rows={3}
@@ -382,7 +417,10 @@ export function RSVP() {
                 type="submit"
                 disabled={isSubmitting || !isUnlocked}
                 className="w-full rounded-lg px-6 py-3 text-sm font-medium tracking-wide shadow-md transition-opacity hover:opacity-95 disabled:opacity-50"
-                style={{ background: P.burgundy, color: P.champagne }}
+                style={{
+                  background: P.burgundy,
+                  color: P.champagne,
+                }}
               >
                 {isSubmitting ? "Sending..." : "Submit RSVP"}
               </button>

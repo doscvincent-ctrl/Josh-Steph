@@ -78,22 +78,25 @@ export const DETAILS = [
 
 export type Invitee = {
   id: string
-  names: string[]
+  name: string
   email: string
   attendance?: string
-  attendingGuests?: boolean[]
+  attending?: boolean
 }
 
-function normalizeInvitee(raw: Record<string, unknown>, index: number): Invitee | null {
-  const lookup = Object.entries(raw).reduce<Record<string, unknown>>((acc, [key, value]) => {
-    const normalizedKey = key
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "")
+function normalizeInvitee(raw: Record<string, unknown>): Invitee | null {
+  const lookup = Object.entries(raw).reduce<Record<string, unknown>>(
+    (acc, [key, value]) => {
+      const normalizedKey = key
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "")
 
-    acc[normalizedKey] = value
-    return acc
-  }, {})
+      acc[normalizedKey] = value
+      return acc
+    },
+    {},
+  )
 
   const name = String(
     lookup.name ??
@@ -106,9 +109,15 @@ function normalizeInvitee(raw: Record<string, unknown>, index: number): Invitee 
   ).trim()
 
   const email = String(
-    lookup.email ?? lookup.emailaddress ?? lookup.guestemail ?? lookup.attendeeemail ?? "",
+    lookup.email ??
+      lookup.emailaddress ??
+      lookup.guestemail ??
+      lookup.attendeeemail ??
+      "",
   ).trim()
 
+  // Every person has their own row, but everyone in the same party uses
+  // the same Code. The Code therefore groups the rows into one invitation.
   const idValue = String(
     lookup.code ??
       lookup.guestcode ??
@@ -122,52 +131,18 @@ function normalizeInvitee(raw: Record<string, unknown>, index: number): Invitee 
       "",
   ).trim()
 
-  // New sheet format: Guest 1, Guest 2, Guest 3, ...
-  const guestEntries = Object.entries(lookup)
-    .map(([key, value]) => {
-      const match = key.match(/^guest(\d+)$/)
-      return match ? { number: Number(match[1]), value } : null
-    })
-    .filter((item): item is { number: number; value: unknown } => item !== null)
-    .sort((a, b) => a.number - b.number)
+  const attendance = String(lookup.attendance ?? "")
+    .trim()
+    .toLowerCase()
 
-  let names = guestEntries
-    .map(({ value }) => String(value ?? "").trim())
-    .filter(Boolean)
-
-  // Backward-compatible fallback for the previous single-name format.
-  if (names.length === 0 && name) {
-    names = [name]
-  }
-
-  const attendance = String(lookup.attendance ?? "").trim().toLowerCase()
-
-  let attendingGuests: boolean[] | undefined
-  const rawAttendingGuests = lookup.attendingguests ?? lookup.attendees
-  if (typeof rawAttendingGuests === "string" && rawAttendingGuests.trim()) {
-    try {
-      const parsed = JSON.parse(rawAttendingGuests)
-      if (Array.isArray(parsed)) {
-        attendingGuests = parsed.map((item) =>
-          typeof item === "object" && item !== null
-            ? String((item as { attending?: unknown }).attending).toLowerCase() === "true"
-            : Boolean(item),
-        )
-      }
-    } catch {
-      // Ignore malformed saved attendance data.
-    }
-  }
-
-  if (!email && !names.length) return null
-  if (!idValue) return null
+  if (!name || !idValue) return null
 
   return {
     id: idValue,
-    names,
-    email: email || "guest@example.com",
-    attendance: attendance === "yes" || attendance === "no" ? attendance : "",
-    attendingGuests,
+    name,
+    email,
+    attendance:
+      attendance === "yes" || attendance === "no" ? attendance : "",
   }
 }
 
@@ -206,7 +181,7 @@ export async function fetchInvitees(): Promise<Invitee[]> {
       const invitees = rows
         .map((row) =>
           typeof row === "object" && row !== null
-            ? normalizeInvitee(row as Record<string, unknown>, rows.indexOf(row))
+            ? normalizeInvitee(row as Record<string, unknown>)
             : null,
         )
         .filter((item): item is Invitee => item !== null)
