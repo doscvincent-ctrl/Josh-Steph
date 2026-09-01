@@ -34,9 +34,9 @@ export function Gallery() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3" style={{ gridTemplateRows: "340px 340px" }}>
+        <div className="gallery-grid grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div
-            className="gallery-item cursor-pointer row-span-2"
+            className="gallery-item cursor-pointer sm:row-span-2"
             style={{ backgroundColor: P.burgundy }}
             onClick={() => setActive(0)}
           >
@@ -87,7 +87,7 @@ export function Gallery() {
             <img
               src={COUPLE_PHOTOS[active].src}
               alt={COUPLE_PHOTOS[active].alt}
-              className="max-h-[90vh] max-w-[90vw] object-contain"
+              className="max-h-[82vh] max-w-[calc(100vw-2rem)] sm:max-h-[90vh] sm:max-w-[90vw] object-contain"
               onClick={(e) => e.stopPropagation()}
             />
             <div className="absolute bottom-6 flex gap-3">
