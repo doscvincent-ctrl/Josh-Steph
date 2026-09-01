@@ -78,10 +78,10 @@ export const DETAILS = [
 
 export type Invitee = {
   id: string
-  name: string
+  names: string[]
   email: string
-  maxGuests?: number
-  attendance?: string // "yes" | "no" | "" — reflects the Attendance column on the sheet
+  attendance?: string
+  attendingGuests?: boolean[]
 }
 
 function normalizeInvitee(raw: Record<string, unknown>, index: number): Invitee | null {
@@ -109,9 +109,6 @@ function normalizeInvitee(raw: Record<string, unknown>, index: number): Invitee 
     lookup.email ?? lookup.emailaddress ?? lookup.guestemail ?? lookup.attendeeemail ?? "",
   ).trim()
 
-  // The guest-facing identifier is the "Code" column on the Invitees
-  // sheet. We still fall back to older aliases (id/slug/etc.) so
-  // existing sheets keep working without a rename.
   const idValue = String(
     lookup.code ??
       lookup.guestcode ??
@@ -125,38 +122,58 @@ function normalizeInvitee(raw: Record<string, unknown>, index: number): Invitee 
       "",
   ).trim()
 
-  const rawGuestCount = Number(
-    lookup.maxguests ??
-      lookup.guests ??
-      lookup.guestcount ??
-      lookup.maxguestcount ??
-      lookup.seats ??
-      1,
-  )
-  const maxGuests = Number.isFinite(rawGuestCount) && rawGuestCount > 0 ? rawGuestCount : 1
+  // New sheet format: Guest 1, Guest 2, Guest 3, ...
+  const guestEntries = Object.entries(lookup)
+    .map(([key, value]) => {
+      const match = key.match(/^guest(\d+)$/)
+      return match ? { number: Number(match[1]), value } : null
+    })
+    .filter((item): item is { number: number; value: unknown } => item !== null)
+    .sort((a, b) => a.number - b.number)
+
+  let names = guestEntries
+    .map(({ value }) => String(value ?? "").trim())
+    .filter(Boolean)
+
+  // Backward-compatible fallback for the previous single-name format.
+  if (names.length === 0 && name) {
+    names = [name]
+  }
 
   const attendance = String(lookup.attendance ?? "").trim().toLowerCase()
 
-  if (!name && !email) return null
+  let attendingGuests: boolean[] | undefined
+  const rawAttendingGuests = lookup.attendingguests ?? lookup.attendees
+  if (typeof rawAttendingGuests === "string" && rawAttendingGuests.trim()) {
+    try {
+      const parsed = JSON.parse(rawAttendingGuests)
+      if (Array.isArray(parsed)) {
+        attendingGuests = parsed.map((item) =>
+          typeof item === "object" && item !== null
+            ? String((item as { attending?: unknown }).attending).toLowerCase() === "true"
+            : Boolean(item),
+        )
+      }
+    } catch {
+      // Ignore malformed saved attendance data.
+    }
+  }
 
-  // A row with no code isn't a valid invitee for this flow — RSVP is
-  // strictly code-gated, so skip rows that can't be looked up by code.
+  if (!email && !names.length) return null
   if (!idValue) return null
 
   return {
     id: idValue,
-    name: name || "Guest",
+    names,
     email: email || "guest@example.com",
-    maxGuests,
     attendance: attendance === "yes" || attendance === "no" ? attendance : "",
+    attendingGuests,
   }
 }
 
 export async function fetchInvitees(): Promise<Invitee[]> {
   const sheetUrl = import.meta.env.VITE_SHEETS_WEB_APP_URL as string | undefined
 
-  // No sheet configured — there's no fallback list anymore, so RSVP
-  // stays locked for everyone until VITE_SHEETS_WEB_APP_URL is set.
   if (!sheetUrl) {
     return []
   }
