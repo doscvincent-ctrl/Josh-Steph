@@ -83,8 +83,6 @@ function doPost(e) {
     spreadsheet.getSheetByName(INVITEES_SHEET_NAME) ||
     spreadsheet.insertSheet(INVITEES_SHEET_NAME)
 
-  ensureHeaders(sheet, INVITEE_HEADERS)
-
   const submittedCode = String(data.guestId || data.code || "")
     .trim()
     .toLowerCase()
@@ -110,19 +108,22 @@ function doPost(e) {
     String(header || "")
       .trim()
       .toLowerCase()
-      .replace(/\s+/g, ""),
+      .replace(/[^a-z0-9]+/g, ""),
   )
 
-  const codeCol = headers.indexOf("code")
-  const nameCol = headers.indexOf("name")
-  const emailCol = headers.indexOf("email")
-  const attendanceCol = headers.indexOf("attendance")
-  const messageCol = headers.indexOf("message")
+  const codeCol = findColumn(
+    headers,
+    "code", "guestcode", "invitecode", "id", "inviteid", "inviteeid", "guestid", "slug", "linkid",
+  )
+  const nameCol = findColumn(headers, "name", "fullname", "guestname", "attendee", "invitee")
+  const emailCol = findColumn(headers, "email", "emailaddress", "guestemail", "attendeeemail")
+  const attendanceCol = findColumn(headers, "attendance")
+  const messageCol = findColumn(headers, "message")
 
   if (codeCol === -1 || nameCol === -1) {
     return jsonResponse({
       ok: false,
-      message: "The Invitees sheet must contain Code and Name columns.",
+      message: "The Invitees sheet must have Code and Name columns (e.g. \"Code\" or \"Guest Code\").",
     })
   }
 
@@ -206,6 +207,7 @@ function doPost(e) {
   })
 
   // Send the confirmation to the address entered in the RSVP form.
+  let emailSent = false
   try {
     const attendingNames = partyRows
       .filter((guest) => {
@@ -237,6 +239,7 @@ function doPost(e) {
         "<p>We look forward to celebrating with you.</p>",
       ].join(""),
     })
+    emailSent = true
   } catch (error) {
     console.error(
       `RSVP saved, but confirmation email failed: ${error}`,
@@ -246,6 +249,7 @@ function doPost(e) {
   return jsonResponse({
     ok: true,
     message: "RSVP recorded successfully.",
+    emailSent,
   })
 }
 
@@ -555,6 +559,16 @@ function parseFormData(e) {
   }
 
   return {}
+}
+
+function findColumn(headers, ...candidates) {
+  // Pick the leftmost column whose header matches any candidate. Scanning
+  // left-to-right (instead of candidate-by-candidate) avoids selecting an
+  // empty duplicate column that ensureHeaders may have appended to the sheet.
+  for (let index = 0; index < headers.length; index++) {
+    if (candidates.includes(headers[index])) return index
+  }
+  return -1
 }
 
 function normalizeName(value) {

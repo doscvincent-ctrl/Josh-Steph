@@ -11,27 +11,54 @@ type RSVPForm = {
 
 const SHEETS_URL = import.meta.env.VITE_SHEETS_WEB_APP_URL as string | undefined
 
-async function submitRSVP(payload: Record<string, string>) {
+type SubmitResult = {
+  ok: boolean
+  message: string
+  emailSent?: boolean
+}
+
+async function submitRSVP(payload: Record<string, string>): Promise<SubmitResult> {
   if (!SHEETS_URL) {
-    return { ok: true, message: "Local demo mode: RSVP saved in memory." }
+    throw new Error(
+      "RSVP isn't connected to the response spreadsheet yet. Please contact the couple.",
+    )
   }
 
-  const response = await fetch(SHEETS_URL, {
-    method: "POST",
-    mode: "no-cors",
-    body: new URLSearchParams(payload),
-  })
-
-  if (response.type === "opaque") {
-    return { ok: true, message: "RSVP recorded successfully." }
+  let response: Response
+  try {
+    response = await fetch(SHEETS_URL, {
+      method: "POST",
+      body: new URLSearchParams(payload),
+    })
+  } catch {
+    throw new Error(
+      "Could not reach the RSVP service. Please check your connection and try again.",
+    )
   }
 
+  // The Apps Script returns HTTP 200 even for logical failures ({ok:false}),
+  // so the JSON body must be inspected, not just the status code.
   const text = await response.text()
-  if (!response.ok) {
-    throw new Error(text || "Unable to save RSVP right now.")
+
+  let parsed: { ok?: boolean; message?: string; emailSent?: boolean } | null =
+    null
+  try {
+    parsed = JSON.parse(text)
+  } catch {
+    parsed = null
   }
 
-  return { ok: true, message: text || "RSVP recorded successfully." }
+  if (!response.ok || parsed?.ok === false) {
+    throw new Error(
+      (parsed && parsed.message) || text || "Unable to save RSVP right now.",
+    )
+  }
+
+  return {
+    ok: true,
+    message: (parsed && parsed.message) || "RSVP recorded successfully.",
+    emailSent: parsed?.emailSent,
+  }
 }
 
 export function RSVP() {
@@ -48,6 +75,8 @@ export function RSVP() {
   const [submitted, setSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
+  const [submitMessage, setSubmitMessage] = useState("")
+  const [emailWarning, setEmailWarning] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -119,6 +148,8 @@ export function RSVP() {
   const handleCodeChange = (value: string) => {
     setErrorMessage("")
     setSubmitted(false)
+    setSubmitMessage("")
+    setEmailWarning(false)
     setForm((current) => ({ ...current, code: value }))
   }
 
@@ -188,7 +219,7 @@ export function RSVP() {
         attending: form.attendance === "yes" && index < form.guestCount,
       }))
 
-      await submitRSVP({
+      const result = await submitRSVP({
         guestId: matchedParty[0].id,
         attendance: form.attendance,
         attendingGuests: JSON.stringify(attendingGuestsPayload),
@@ -196,6 +227,13 @@ export function RSVP() {
         email: form.email,
       })
 
+      setSubmitMessage(
+        result.message ||
+          (form.attendance === "yes"
+            ? "We've saved your RSVP and look forward to celebrating with you."
+            : "We've received your response and are sorry you can't make it."),
+      )
+      setEmailWarning(result.emailSent === false)
       setSubmitted(true)
     } catch (error) {
       setErrorMessage(
@@ -275,10 +313,20 @@ export function RSVP() {
               className="text-sm leading-relaxed"
               style={{ color: P.burgundyDk }}
             >
-              {form.attendance === "yes"
-                ? "We've saved your RSVP and look forward to celebrating with you."
-                : "We've received your response and are sorry you can't make it."}
+              {submitMessage ||
+                (form.attendance === "yes"
+                  ? "We've saved your RSVP and look forward to celebrating with you."
+                  : "We've received your response and are sorry you can't make it.")}
             </p>
+            {emailWarning && (
+              <p
+                className="mt-3 text-xs leading-relaxed"
+                style={{ color: P.burgundy }}
+              >
+                Your RSVP was saved, but the confirmation email couldn't be
+                sent. We'll follow up with you separately.
+              </p>
+            )}
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mx-auto">
