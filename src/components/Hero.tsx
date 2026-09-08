@@ -45,7 +45,7 @@ export function Hero() {
 
       <div className="relative z-10 flex flex-col items-center gap-5">
         <p
-          className="font-script italic text-xl tracking-widest animate-fade-up"
+          className="text-xs uppercase tracking-widest animate-fade-up"
           style={{ color: P.champagne, letterSpacing: "0.35em" }}
         >
           Together Forever
@@ -57,7 +57,7 @@ export function Hero() {
         >
           Josh
           <span
-            className="mx-4 font-script italic font-light"
+            className="mx-4 font-light"
             style={{ color: P.pink }}
           >
             &amp;
@@ -67,7 +67,7 @@ export function Hero() {
 
         <div className="soft-divider w-48 animate-fade-up delay-400">
           <span
-            className="font-script italic text-sm"
+            className="text-xs uppercase"
             style={{ color: P.champagne, letterSpacing: "0.3em" }}
           >
             05 · 02 · 2027
@@ -90,7 +90,7 @@ export function Hero() {
               className="countdown-box flex flex-col items-center justify-center px-4 py-3 min-w-[70px]"
             >
               <span
-                className="font-display text-3xl font-bold leading-none"
+                className="text-3xl font-semibold leading-none"
                 style={{ color: P.pink }}
               >
                 {String(value).padStart(2, "0")}

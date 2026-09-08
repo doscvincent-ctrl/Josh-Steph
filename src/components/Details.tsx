@@ -10,7 +10,7 @@ export function Details() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <p
-            className="font-script italic text-lg mb-2"
+            className="text-xs uppercase tracking-[0.25em] mb-2"
             style={{ color: P.champagne, letterSpacing: "0.25em" }}
           >
             Mark your calendar
@@ -45,7 +45,7 @@ export function Details() {
               }
             >
               <div
-                className="text-3xl mb-4 font-display"
+                className="text-3xl mb-4"
                 style={{ color: P.pink }}
               >
                 {d.icon}
@@ -60,11 +60,11 @@ export function Details() {
                 className="h-px mb-4 mx-6"
                 style={{ background: `${P.pink}30` }}
               />
-              <p className="font-display text-white text-sm leading-loose">
+              <p className="text-white text-sm leading-loose">
                 {d.line1}
               </p>
               <p
-                className="font-display italic text-base mt-1"
+                className="italic text-base mt-1"
                 style={{ color: P.champagne }}
               >
                 {d.line2}
@@ -86,7 +86,7 @@ export function Details() {
           >
             Location
           </p>
-          <p className="font-display text-white/80 text-sm">
+          <p className="text-white/80 text-sm">
             Fruella’s Events Place Tagaytay
           </p>
           <a

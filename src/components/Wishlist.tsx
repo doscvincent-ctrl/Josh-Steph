@@ -64,7 +64,7 @@ export function Wishlist() {
     <section id="wishlist" className="px-4 py-24" style={{ background: P.champagne }}>
       <div className="mx-auto max-w-5xl">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="font-script text-2xl italic tracking-[0.14em]" style={{ color: P.burgundy }}>
+          <p className="text-sm uppercase tracking-[0.14em]" style={{ color: P.burgundy }}>
             With grateful hearts
           </p>
           <h2 className="font-display mt-2 text-4xl md:text-5xl" style={{ color: P.black }}>
@@ -84,7 +84,7 @@ export function Wishlist() {
                 <span className="text-[0.63rem] uppercase tracking-[0.17em]" style={{ color: P.burgundy }}>{gift.category}</span>
               </div>
               <div className="mt-auto pt-8">
-                <h3 className="font-display text-xl" style={{ color: P.black }}>{gift.title}</h3>
+                <h3 className="text-base font-semibold tracking-wide" style={{ color: P.black }}>{gift.title}</h3>
                 <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>{gift.description}</p>
                 {gift.link && (
                   <a href={externalUrl(gift.link)} target="_blank" rel="noreferrer" className="mt-5 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70" style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}>
@@ -97,7 +97,7 @@ export function Wishlist() {
         </div>
 
         <div className="mt-9 text-center">
-          <p className="font-display italic text-lg" style={{ color: P.burgundy }}>A contribution toward our future together is also deeply appreciated.</p>
+          <p className="text-sm italic" style={{ color: P.burgundy }}>A contribution toward our future together is also deeply appreciated.</p>
         </div>
       </div>
     </section>

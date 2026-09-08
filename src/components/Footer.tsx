@@ -7,13 +7,13 @@ export function Footer() {
       style={{ background: P.burgundy, borderTop: `1px solid ${P.pink}25` }}
     >
       <p
-        className="font-display italic text-3xl mb-3"
+        className="text-lg font-semibold tracking-wide mb-3"
         style={{ color: P.champagne }}
       >
         Josh &amp; Steph
       </p>
       <p
-        className="font-script italic text-base mb-6"
+        className="text-xs uppercase tracking-[0.25em] mb-6"
         style={{ color: `${P.pink}90`, letterSpacing: "0.25em" }}
       >
         February 5, 2027

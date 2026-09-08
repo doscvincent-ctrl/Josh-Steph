@@ -224,7 +224,7 @@ export function RSVP() {
       <div className="max-w-md mx-auto">
         <div className="text-center mb-8">
           <p
-            className="font-script text-2xl md:text-3xl italic"
+            className="text-xs uppercase tracking-[0.12em]"
             style={{ color: P.burgundy, letterSpacing: "0.12em" }}
           >
             RSVP
@@ -258,7 +258,7 @@ export function RSVP() {
               ♡
             </div>
             <h3
-              className="font-display text-2xl mb-2"
+              className="text-xl font-semibold mb-2"
               style={{ color: P.black }}
             >
               Thank you, {names[0] ?? "Guest"}!

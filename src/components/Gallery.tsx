@@ -23,7 +23,7 @@ export function Gallery() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <p
-            className="font-script italic text-lg mb-2"
+            className="text-xs uppercase tracking-[0.25em] mb-2"
             style={{ color: P.taupe, letterSpacing: "0.25em" }}
           >
             Captured moments

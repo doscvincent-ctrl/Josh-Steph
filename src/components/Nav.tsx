@@ -22,7 +22,7 @@ export function Nav() {
     >
       <div className="max-w-5xl mx-auto flex items-center justify-between">
         <span
-          className="font-display italic text-lg tracking-wide"
+          className="text-sm font-semibold tracking-[0.2em]"
           style={{ color: P.champagne }}
         >
           J &amp; S
