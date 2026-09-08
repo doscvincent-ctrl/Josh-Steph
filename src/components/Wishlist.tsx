@@ -27,6 +27,15 @@ function GiftIcon() {
   )
 }
 
+function externalUrl(link: string) {
+  const trimmed = link.trim()
+  if (!trimmed) return ""
+
+  return /^https?:/i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed.replace(/^\/+/, "")}`
+}
+
 export function Wishlist() {
   const [gifts, setGifts] = useState(GIFT_PREFERENCES)
 
@@ -78,7 +87,7 @@ export function Wishlist() {
                 <h3 className="font-display text-xl" style={{ color: P.black }}>{gift.title}</h3>
                 <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>{gift.description}</p>
                 {gift.link && (
-                  <a href={gift.link} target="_blank" rel="noreferrer" className="mt-5 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70" style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}>
+                  <a href={externalUrl(gift.link)} target="_blank" rel="noreferrer" className="mt-5 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70" style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}>
                     View gift ↗
                   </a>
                 )}
