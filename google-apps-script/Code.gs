@@ -1,4 +1,6 @@
 const INVITEES_SHEET_NAME = "Invitees"
+const WISHLIST_SHEET_NAME = "Wishlist"
+const ENTOURAGE_SHEET_NAME = "Entourage"
 
 // Each invited person has their own row.
 // People belonging to the same invitation share the same Code.
@@ -13,17 +15,34 @@ const INVITEES_SHEET_NAME = "Invitees"
 // party is determined by how many rows have the same Code.
 
 const INVITEE_HEADERS = ["Code", "Name", "Email", "Attendance", "Message"]
+const WISHLIST_HEADERS = ["Id", "Title", "Description", "Category", "Link"]
+const ENTOURAGE_HEADERS = ["Name", "Role", "Group"]
 
 function doGet(e) {
   const action = String(
     e && e.parameter && e.parameter.action ? e.parameter.action : "",
   )
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
+  ensureWeddingSheets(spreadsheet)
 
   if (action === "invitees" || action === "guests") {
     return jsonResponse({
       ok: true,
       invitees: getInvitees(spreadsheet),
+    })
+  }
+
+  if (action === "wishlist") {
+    return jsonResponse({
+      ok: true,
+      gifts: getWishlist(spreadsheet),
+    })
+  }
+
+  if (action === "entourage") {
+    return jsonResponse({
+      ok: true,
+      entourage: getEntourage(spreadsheet),
     })
   }
 
@@ -38,14 +57,16 @@ function doGet(e) {
 }
 
 function doPost(e) {
+  const data = parseFormData(e)
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
+  ensureWeddingSheets(spreadsheet)
+
   const sheet =
     spreadsheet.getSheetByName(INVITEES_SHEET_NAME) ||
     spreadsheet.insertSheet(INVITEES_SHEET_NAME)
 
   ensureHeaders(sheet, INVITEE_HEADERS)
 
-  const data = parseFormData(e)
   const submittedCode = String(data.guestId || data.code || "")
     .trim()
     .toLowerCase()
@@ -298,7 +319,107 @@ function getInvitees(spreadsheet) {
   return invitees
 }
 
+// Run this function once from the Apps Script editor to create every tab and
+// its headers. The script must be bound to the wedding spreadsheet.
+function setupWeddingSheets() {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
+  if (!spreadsheet) {
+    throw new Error("Open this script from its Google Sheet before running setupWeddingSheets.")
+  }
+
+  ensureWeddingSheets(spreadsheet)
+}
+
+function ensureWeddingSheets(spreadsheet) {
+  const sheetDefinitions = [
+    [INVITEES_SHEET_NAME, INVITEE_HEADERS],
+    [WISHLIST_SHEET_NAME, WISHLIST_HEADERS],
+    [ENTOURAGE_SHEET_NAME, ENTOURAGE_HEADERS],
+  ]
+
+  sheetDefinitions.forEach(([name, headers]) => {
+    const sheet = spreadsheet.getSheetByName(name) || spreadsheet.insertSheet(name)
+    ensureHeaders(sheet, headers)
+  })
+}
+
+function getWishlist(spreadsheet) {
+  const giftsSheet =
+    spreadsheet.getSheetByName(WISHLIST_SHEET_NAME) ||
+    spreadsheet.insertSheet(WISHLIST_SHEET_NAME)
+
+  ensureHeaders(giftsSheet, WISHLIST_HEADERS)
+
+  const rows = giftsSheet.getDataRange().getValues()
+  if (rows.length <= 1) return []
+
+  const headers = rows[0].map((header) =>
+    String(header || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ""),
+  )
+
+  return rows.slice(1).flatMap((row) => {
+    const record = {}
+    headers.forEach((header, index) => {
+      record[header] = row[index] ?? ""
+    })
+
+    const id = String(record.id || "").trim()
+    const title = String(record.title || "").trim()
+    if (!id || !title) return []
+
+    return [{
+      id,
+      title,
+      description: String(record.description || ""),
+      category: String(record.category || "For our home"),
+      link: String(record.link || ""),
+    }]
+  })
+}
+
+function getEntourage(spreadsheet) {
+  const sheet =
+    spreadsheet.getSheetByName(ENTOURAGE_SHEET_NAME) ||
+    spreadsheet.insertSheet(ENTOURAGE_SHEET_NAME)
+  ensureHeaders(sheet, ENTOURAGE_HEADERS)
+
+  const rows = sheet.getDataRange().getValues()
+  if (rows.length <= 1) return []
+
+  const headers = rows[0].map((header) =>
+    String(header || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ""),
+  )
+
+  return rows.slice(1).flatMap((row) => {
+    const record = {}
+    headers.forEach((header, index) => {
+      record[header] = row[index] ?? ""
+    })
+
+    const name = String(record.name || "").trim()
+    if (!name) return []
+
+    return [{
+      name,
+      role: String(record.role || "").trim(),
+      group: String(record.group || "Support Team").trim(),
+    }]
+  })
+}
+
 function ensureHeaders(sheet, headers) {
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers])
+    sheet.setFrozenRows(1)
+    return
+  }
+
   const lastColumn = Math.max(sheet.getLastColumn(), 1)
   const currentHeaders = sheet
     .getRange(1, 1, 1, lastColumn)
@@ -327,7 +448,7 @@ function ensureHeaders(sheet, headers) {
 function parseFormData(e) {
   if (!e) return {}
 
-  if (e.parameter && (e.parameter.guestId || e.parameter.code)) {
+  if (e.parameter && Object.keys(e.parameter).length) {
     return Object.fromEntries(
       Object.entries(e.parameter).map(([key, value]) => [
         key,

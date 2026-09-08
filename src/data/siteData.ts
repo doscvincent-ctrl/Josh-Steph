@@ -76,6 +76,42 @@ export const DETAILS = [
   },
 ]
 
+export type GiftPreference = {
+  id: string
+  title: string
+  description: string
+  category: string
+  link?: string
+}
+
+export type EntourageMember = {
+  name: string
+  role: string
+  group: string
+}
+
+// Sheet-backed entourage data replaces these placeholders when available.
+export const ENTOURAGE: EntourageMember[] = [
+  { name: "Ava Santos", role: "Maid of Honor", group: "Bridesmaids" },
+  { name: "Mia Reyes", role: "Bridesmaid", group: "Bridesmaids" },
+  { name: "Daniel Cruz", role: "Best Man", group: "Groomsmen" },
+  { name: "Marco Flores", role: "Groomsman", group: "Groomsmen" },
+  { name: "Elena Santos", role: "Mother of the Bride", group: "Family" },
+  { name: "Victor Cruz", role: "Father of the Groom", group: "Family" },
+  { name: "Sofia Lim", role: "Wedding Coordinator", group: "Support Team" },
+]
+
+// These are shown until the shared Google Sheets web app provides a live list.
+// Add a `link` to send guests to a registry.
+export const GIFT_PREFERENCES: GiftPreference[] = [
+  { id: "home-fund", title: "Home Fund", description: "A little something toward making our first home our own.", category: "Our future" },
+  { id: "dining-set", title: "Dinner for Six", description: "For slow Sunday lunches and evenings shared around our table.", category: "For our home" },
+  { id: "getaway-fund", title: "A Weekend Away", description: "Help us make a memory somewhere new after the celebration.", category: "Experiences" },
+  { id: "kitchen-essentials", title: "Kitchen Essentials", description: "The thoughtful tools behind many future meals made together.", category: "For our home" },
+  { id: "date-night", title: "Date Night Fund", description: "Because we plan to keep choosing one another, again and again.", category: "Experiences" },
+  { id: "garden-corner", title: "A Garden Corner", description: "For a little green space we can tend and enjoy together.", category: "Our future" },
+]
+
 export type Invitee = {
   id: string
   name: string

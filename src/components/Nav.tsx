@@ -32,6 +32,8 @@ export function Nav() {
             "Our Story",
             "Gallery",
             "Details",
+            "Entourage",
+            "Wishlist",
             "RSVP",
           ].map((label) => (
             <a
