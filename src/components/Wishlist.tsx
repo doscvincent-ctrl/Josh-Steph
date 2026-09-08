@@ -137,9 +137,12 @@ export function Wishlist() {
                 For Monetary Gifts
               </p>
               <div className="soft-divider mx-auto mt-3 max-w-24" />
+              <p className="mt-6 text-sm leading-7" style={{ color: P.burgundyDk }}>
+                While our unofficial theme song is... "How do I live without you," we'd still need the practicals of everyday life! We'd gladly accept monetary gifts as we learn the beautiful art of living together. Your generosity will help us build our little home, stock our fridge, and fund important married-life essentials... like rice, dishwashing liquid, and the occasional Grab delivery on days when "what's for dinner?" becomes a serious discussion.
+              </p>
             </div>
 
-            <div className={`mx-auto mt-8 grid max-w-3xl gap-5 ${monetaryGifts.length > 1 ? "sm:grid-cols-2" : ""}`}>
+            <div className={`mx-auto mt-8 grid max-w-4xl gap-5 ${monetaryGifts.length > 1 ? "sm:grid-cols-2" : ""}`}>
               {monetaryGifts.map((gift) => (
                 <article
                   key={gift.id}
@@ -164,7 +167,7 @@ export function Wishlist() {
                       <img
                         src={qrImageUrl(gift.qrCode)}
                         alt={`QR code for ${gift.title}`}
-                        className="mx-auto aspect-square w-48 object-contain"
+                        className="mx-auto aspect-square w-72 object-contain"
                         onError={() => markQrBroken(gift.id)}
                       />
                     </div>
@@ -181,18 +184,6 @@ export function Wishlist() {
                   <p className="mt-3 text-[0.65rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
                     Scan to send a gift
                   </p>
-
-                  {gift.link && (
-                    <a
-                      href={externalUrl(gift.link)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-4 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70"
-                      style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}
-                    >
-                      View details ↗
-                    </a>
-                  )}
                 </article>
               ))}
             </div>
