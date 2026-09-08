@@ -1,7 +1,7 @@
 const imagePath = (filename: string) =>
   `${import.meta.env.BASE_URL}imports/${filename}`
 
-const heroPhoto = imagePath("cda69251-0cda-4945-bb14-314d33e6b53b.jpg")
+const heroPhoto = imagePath("d634c711-db0a-41c8-88da-079f1086bf0f.jpg")
 
 const importedImages = import.meta.glob(
   "../imports/*.{jpg,jpeg,png,webp}",

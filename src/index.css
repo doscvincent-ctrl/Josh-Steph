@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Infant:ital,wght@0,300;0,400;1,300;1,400&family=Lato:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Josefin+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap');
 @import 'tailwindcss';
 
 /* ── Palette tokens ── */
@@ -12,13 +12,13 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Josefin Sans', sans-serif;
   background-color: #EDE0D0;
   color: #1A1A1A;
 }
 
-.font-display  { font-family: 'Playfair Display', serif; }
-.font-script   { font-family: 'Cormorant Infant', serif; }
+.font-display,
+.font-script { font-family: 'Dancing Script', cursive; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
@@ -93,7 +93,7 @@ body {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(196,144,144,0.45);
   color: #F2D9C8;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Josefin Sans', sans-serif;
   font-size: 0.9rem;
   letter-spacing: 0.04em;
   outline: none;
@@ -112,7 +112,7 @@ body {
 
 /* Nav links */
 .nav-link {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Josefin Sans', sans-serif;
   font-size: 0.75rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;

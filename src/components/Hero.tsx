@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { P } from "../data/siteData"
 
-const heroPhoto = `${import.meta.env.BASE_URL}imports/cda69251-0cda-4945-bb14-314d33e6b53b.jpg`
+const heroPhoto = `${import.meta.env.BASE_URL}imports/d634c711-db0a-41c8-88da-079f1086bf0f.jpg`
 
 function useCountdown(targetDate: string) {
   const calc = () => {
