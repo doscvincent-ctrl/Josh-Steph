@@ -63,15 +63,29 @@ function externalUrl(link: string) {
 
 function qrImageUrl(link: string) {
   const url = externalUrl(link)
-  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/i)
 
-  return driveMatch
-    ? `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`
-    : url
+  // Recognize the common Google Drive share-link shapes:
+  //   .../file/d/FILE_ID/view
+  //   .../open?id=FILE_ID
+  //   ...?id=FILE_ID  (already a uc/thumbnail-style link)
+  const fileIdMatch =
+    url.match(/drive\.google\.com\/file\/d\/([^/?]+)/i) ||
+    url.match(/drive\.google\.com\/open\?id=([^&]+)/i) ||
+    url.match(/[?&]id=([^&]+)/i)
+
+  const fileId = fileIdMatch ? fileIdMatch[1] : null
+
+  // The "thumbnail" endpoint embeds far more reliably than "uc?export=view",
+  // which Google has been known to block for hotlinked <img> tags.
+  return fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000` : url
 }
 
 export function Wishlist() {
   const [gifts, setGifts] = useState(GIFT_PREFERENCES)
+  // Tracks gift ids whose QR image failed to load, so a bad/misconfigured
+  // link shows a clear message instead of a broken-image icon.
+  const [brokenQr, setBrokenQr] = useState<Record<string, boolean>>({})
+  const markQrBroken = (id: string) => setBrokenQr((current) => ({ ...current, [id]: true }))
 
   useEffect(() => {
     if (!SHEETS_URL) return
@@ -114,60 +128,75 @@ export function Wishlist() {
         </div>
 
         {/* Featured monetary-gift QR section — pulled out of the regular
-            grid so the QR code is large enough to scan comfortably. */}
+            grid so the QR code is large enough to scan comfortably, and
+            labeled with its own subheading so it reads as a distinct group. */}
         {monetaryGifts.length > 0 && (
-          <div className={`mx-auto mt-12 grid max-w-3xl gap-5 ${monetaryGifts.length > 1 ? "sm:grid-cols-2" : ""}`}>
-            {monetaryGifts.map((gift) => (
-              <article
-                key={gift.id}
-                className="flex flex-col items-center rounded-sm border p-8 text-center"
-                style={{ background: P.beige, borderColor: `${P.taupe}80` }}
-              >
-                <MoneyIcon />
-                <span className="mt-4 text-[0.63rem] uppercase tracking-[0.17em]" style={{ color: P.burgundy }}>
-                  {gift.category}
-                </span>
-                <h3 className="font-display mt-2 text-2xl" style={{ color: P.black }}>
-                  {gift.title}
-                </h3>
-                {gift.description && (
-                  <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>
-                    {gift.description}
+          <>
+            <div className="mx-auto mt-14 max-w-2xl text-center">
+              <p className="text-xs uppercase tracking-[0.16em]" style={{ color: P.burgundy }}>
+                For Monetary Gifts
+              </p>
+              <div className="soft-divider mx-auto mt-3 max-w-24" />
+            </div>
+
+            <div className={`mx-auto mt-8 grid max-w-3xl gap-5 ${monetaryGifts.length > 1 ? "sm:grid-cols-2" : ""}`}>
+              {monetaryGifts.map((gift) => (
+                <article
+                  key={gift.id}
+                  className="flex flex-col items-center rounded-sm border p-8 text-center"
+                  style={{ background: P.beige, borderColor: `${P.taupe}80` }}
+                >
+                  <MoneyIcon />
+                  <span className="mt-4 text-[0.63rem] uppercase tracking-[0.17em]" style={{ color: P.burgundy }}>
+                    {gift.category}
+                  </span>
+                  <h3 className="font-display mt-2 text-2xl" style={{ color: P.black }}>
+                    {gift.title}
+                  </h3>
+                  {gift.description && (
+                    <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>
+                      {gift.description}
+                    </p>
+                  )}
+
+                  {gift.qrCode && !brokenQr[gift.id] ? (
+                    <div className="mt-6 border p-3" style={{ background: "white", borderColor: `${P.taupe}80` }}>
+                      <img
+                        src={qrImageUrl(gift.qrCode)}
+                        alt={`QR code for ${gift.title}`}
+                        className="mx-auto aspect-square w-48 object-contain"
+                        onError={() => markQrBroken(gift.id)}
+                      />
+                    </div>
+                  ) : gift.qrCode ? (
+                    <p className="mt-6 text-xs italic" style={{ color: P.burgundyDk }}>
+                      QR code unavailable — check the sharing settings on the linked image.
+                    </p>
+                  ) : (
+                    <p className="mt-6 text-xs italic" style={{ color: P.burgundyDk }}>
+                      QR code coming soon.
+                    </p>
+                  )}
+
+                  <p className="mt-3 text-[0.65rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
+                    Scan to send a gift
                   </p>
-                )}
 
-                {gift.qrCode ? (
-                  <div className="mt-6 border p-3" style={{ background: "white", borderColor: `${P.taupe}80` }}>
-                    <img
-                      src={qrImageUrl(gift.qrCode)}
-                      alt={`QR code for ${gift.title}`}
-                      className="mx-auto aspect-square w-48 object-contain"
-                    />
-                  </div>
-                ) : (
-                  <p className="mt-6 text-xs italic" style={{ color: P.burgundyDk }}>
-                    QR code coming soon.
-                  </p>
-                )}
-
-                <p className="mt-3 text-[0.65rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
-                  Scan to send a gift
-                </p>
-
-                {gift.link && (
-                  <a
-                    href={externalUrl(gift.link)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-4 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70"
-                    style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}
-                  >
-                    View details ↗
-                  </a>
-                )}
-              </article>
-            ))}
-          </div>
+                  {gift.link && (
+                    <a
+                      href={externalUrl(gift.link)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-4 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70"
+                      style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}
+                    >
+                      View details ↗
+                    </a>
+                  )}
+                </article>
+              ))}
+            </div>
+          </>
         )}
 
         {registryGifts.length > 0 && (
@@ -181,13 +210,23 @@ export function Wishlist() {
                 <div className="mt-auto pt-8">
                   <h3 className="text-base font-semibold tracking-wide" style={{ color: P.black }}>{gift.title}</h3>
                   <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>{gift.description}</p>
-                  {gift.qrCode && (
+                  {gift.qrCode && !brokenQr[gift.id] && (
                     <div className="mt-5 border p-2" style={{ background: "white", borderColor: `${P.taupe}80` }}>
-                      <img src={qrImageUrl(gift.qrCode)} alt={`QR code for ${gift.title}`} className="mx-auto aspect-square w-32 object-contain" />
+                      <img
+                        src={qrImageUrl(gift.qrCode)}
+                        alt={`QR code for ${gift.title}`}
+                        className="mx-auto aspect-square w-32 object-contain"
+                        onError={() => markQrBroken(gift.id)}
+                      />
                       <p className="mt-2 text-center text-[0.6rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
                         Scan to send a gift
                       </p>
                     </div>
+                  )}
+                  {gift.qrCode && brokenQr[gift.id] && (
+                    <p className="mt-5 text-xs italic" style={{ color: P.burgundyDk }}>
+                      QR code unavailable — check the sharing settings on the linked image.
+                    </p>
                   )}
                   {gift.link && (
                     <a href={externalUrl(gift.link)} target="_blank" rel="noreferrer" className="mt-5 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70" style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}>
