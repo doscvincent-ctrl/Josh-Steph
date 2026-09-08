@@ -139,17 +139,22 @@ export function Wishlist() {
                   <h3 className="text-base font-semibold tracking-wide" style={{ color: P.black }}>{gift.title}</h3>
                   <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>{gift.description}</p>
                   {gift.qrCode && !brokenQr[gift.id] && (
-                    <div className="mt-5 border p-2" style={{ background: "white", borderColor: `${P.taupe}80` }}>
+                    <div
+                      className="mx-auto mt-5 w-full max-w-[140px] overflow-hidden rounded-lg shadow-sm"
+                      style={{ background: "white" }}
+                    >
                       <img
                         src={qrImageUrl(gift.qrCode)}
                         alt={`QR code for ${gift.title}`}
-                        className="mx-auto aspect-square w-32 object-contain"
+                        className="block h-auto w-full"
                         onError={() => markQrBroken(gift.id)}
                       />
-                      <p className="mt-2 text-center text-[0.6rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
-                        Scan to send a gift
-                      </p>
                     </div>
+                  )}
+                  {gift.qrCode && !brokenQr[gift.id] && (
+                    <p className="mt-2 text-center text-[0.6rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
+                      Scan to send a gift
+                    </p>
                   )}
                   {gift.qrCode && brokenQr[gift.id] && (
                     <p className="mt-5 text-xs italic" style={{ color: P.burgundyDk }}>
@@ -166,12 +171,14 @@ export function Wishlist() {
             ))}
           </div>
         )}
+
         {/* Featured monetary-gift QR section — pulled out of the regular
             grid so the QR code is large enough to scan comfortably, and
-            labeled with its own subheading so it reads as a distinct group. */}
+            labeled with its own subheading so it reads as a distinct group.
+            Placed after the regular gift grid intentionally. */}
         {monetaryGifts.length > 0 && (
           <>
-            <div className="mx-auto mt-14 max-w-2xl text-center">
+            <div className="mx-auto mt-16 max-w-2xl text-center">
               <p className="text-xs uppercase tracking-[0.16em]" style={{ color: P.burgundy }}>
                 For Monetary Gifts
               </p>
@@ -181,18 +188,15 @@ export function Wishlist() {
               </p>
             </div>
 
-            <div className={`mx-auto mt-8 grid max-w-4xl gap-5 ${monetaryGifts.length > 1 ? "sm:grid-cols-2" : ""}`}>
+            <div className={`mx-auto mt-8 grid max-w-4xl gap-6 ${monetaryGifts.length > 1 ? "sm:grid-cols-2" : ""}`}>
               {monetaryGifts.map((gift) => (
                 <article
                   key={gift.id}
-                  className="flex flex-col items-center rounded-sm border p-8 text-center"
-                  style={{ background: P.beige, borderColor: `${P.taupe}80` }}
+                  className="flex flex-col items-center rounded-xl border p-6 text-center shadow-sm transition-transform duration-300 hover:-translate-y-1 sm:p-8"
+                  style={{ background: P.beige, borderColor: `${P.taupe}50` }}
                 >
                   <MoneyIcon />
-                  <span className="mt-4 text-[0.63rem] uppercase tracking-[0.17em]" style={{ color: P.burgundy }}>
-                    {gift.category}
-                  </span>
-                  <h3 className="font-display mt-2 text-2xl" style={{ color: P.black }}>
+                  <h3 className="font-display mt-3 text-2xl" style={{ color: P.black }}>
                     {gift.title}
                   </h3>
                   {gift.description && (
@@ -202,11 +206,19 @@ export function Wishlist() {
                   )}
 
                   {gift.qrCode && !brokenQr[gift.id] ? (
-                    <div className="mt-6 border p-3" style={{ background: "white", borderColor: `${P.taupe}80` }}>
+                    // No fixed square crop here — bank/e-wallet QR screenshots
+                    // rarely come pre-cropped to a perfect square, so this
+                    // scales the image's own natural aspect ratio instead of
+                    // letterboxing it. A capped width keeps it from
+                    // overwhelming the card on any screen size.
+                    <div
+                      className="mt-6 w-full max-w-[220px] overflow-hidden rounded-lg shadow-md sm:max-w-[260px]"
+                      style={{ background: "white" }}
+                    >
                       <img
                         src={qrImageUrl(gift.qrCode)}
                         alt={`QR code for ${gift.title}`}
-                        className="mx-auto aspect-square w-72 object-contain"
+                        className="block h-auto w-full"
                         onError={() => markQrBroken(gift.id)}
                       />
                     </div>
@@ -220,7 +232,7 @@ export function Wishlist() {
                     </p>
                   )}
 
-                  <p className="mt-3 text-[0.65rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
+                  <p className="mt-4 text-[0.65rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
                     Scan to send a gift
                   </p>
                 </article>
