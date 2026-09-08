@@ -87,18 +87,17 @@ export type GiftPreference = {
 export type EntourageMember = {
   name: string
   role: string
-  group: string
 }
 
 // Sheet-backed entourage data replaces these placeholders when available.
 export const ENTOURAGE: EntourageMember[] = [
-  { name: "Ava Santos", role: "Maid of Honor", group: "Bridesmaids" },
-  { name: "Mia Reyes", role: "Bridesmaid", group: "Bridesmaids" },
-  { name: "Daniel Cruz", role: "Best Man", group: "Groomsmen" },
-  { name: "Marco Flores", role: "Groomsman", group: "Groomsmen" },
-  { name: "Elena Santos", role: "Mother of the Bride", group: "Family" },
-  { name: "Victor Cruz", role: "Father of the Groom", group: "Family" },
-  { name: "Sofia Lim", role: "Wedding Coordinator", group: "Support Team" },
+  { name: "Ava Santos", role: "Maid of Honor" },
+  { name: "Mia Reyes", role: "Bridesmaid" },
+  { name: "Daniel Cruz", role: "Best Man" },
+  { name: "Marco Flores", role: "Groomsman" },
+  { name: "Elena Santos", role: "Mother of the Bride" },
+  { name: "Victor Cruz", role: "Father of the Groom" },
+  { name: "Sofia Lim", role: "Wedding Coordinator" },
 ]
 
 // These are shown until the shared Google Sheets web app provides a live list.

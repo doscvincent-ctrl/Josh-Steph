@@ -16,7 +16,7 @@ const ENTOURAGE_SHEET_NAME = "Entourage"
 
 const INVITEE_HEADERS = ["Code", "Name", "Email", "Attendance", "Message"]
 const WISHLIST_HEADERS = ["Id", "Title", "Description", "Category", "Link"]
-const ENTOURAGE_HEADERS = ["Name", "Role", "Group"]
+const ENTOURAGE_HEADERS = ["Name", "Role"]
 
 function doGet(e) {
   const action = String(
@@ -418,7 +418,6 @@ function getEntourage(spreadsheet) {
     return [{
       name,
       role: String(record.role || "").trim(),
-      group: String(record.group || "Support Team").trim(),
     }]
   })
 }

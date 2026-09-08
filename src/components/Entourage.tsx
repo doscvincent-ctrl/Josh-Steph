@@ -3,8 +3,6 @@ import { ENTOURAGE, P, type EntourageMember } from "../data/siteData"
 
 const SHEETS_URL = import.meta.env.VITE_SHEETS_WEB_APP_URL as string | undefined
 
-const GROUP_ORDER = ["Bridesmaids", "Groomsmen", "Family", "Support Team"]
-
 function normalizeMember(raw: Record<string, unknown>): EntourageMember | null {
   const name = String(raw.name ?? "").trim()
   if (!name) return null
@@ -12,7 +10,6 @@ function normalizeMember(raw: Record<string, unknown>): EntourageMember | null {
   return {
     name,
     role: String(raw.role ?? "").trim(),
-    group: String(raw.group ?? "Support Team").trim(),
   }
 }
 
@@ -38,12 +35,9 @@ export function Entourage() {
       })
   }, [])
 
-  const orderedGroups = [...GROUP_ORDER, ...people.map((person) => person.group).filter((group) => !GROUP_ORDER.includes(group))]
-  const groups = orderedGroups
-    .map((label) => ({ label, people: people.filter((person) => person.group === label) }))
-    .filter((group) => group.people.length > 0)
+  const roles = Array.from(new Set(people.map((person) => person.role || "Wedding Party")))
 
-  if (!groups.length) return null
+  if (!roles.length) return null
 
   return (
     <section
@@ -75,10 +69,10 @@ export function Entourage() {
           </div>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
-          {groups.map((group) => (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {roles.map((role) => (
             <div
-              key={group.label}
+              key={role}
               className="rounded-sm p-6"
               style={{
                 background: "rgba(255,255,255,0.22)",
@@ -89,35 +83,17 @@ export function Entourage() {
                 className="text-xs tracking-[0.22em] uppercase mb-5 text-center"
                 style={{ color: P.burgundy }}
               >
-                {group.label}
+                {role}
               </p>
 
-              <div className="space-y-6">
-                {Array.from(new Set(group.people.map((person) => person.role))).map((role) => (
-                  <div key={role} className="text-center">
-                    {role && (
-                      <p
-                        className="text-xs uppercase tracking-[0.18em]"
-                        style={{ color: P.taupe }}
-                      >
-                        {role}
-                      </p>
-                    )}
-                    <div className={role ? "mt-2 space-y-1.5" : "space-y-1.5"}>
-                      {group.people
-                        .filter((person) => person.role === role)
-                        .map((person) => (
-                    <p
-                      key={person.name}
-                      className="font-display text-xl"
-                      style={{ color: P.burgundy }}
-                    >
+              <div className="space-y-2 text-center">
+                {people
+                  .filter((person) => (person.role || "Wedding Party") === role)
+                  .map((person) => (
+                    <p key={person.name} className="font-display text-xl" style={{ color: P.burgundy }}>
                       {person.name}
                     </p>
-                        ))}
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           ))}
