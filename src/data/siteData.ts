@@ -52,6 +52,8 @@ export const STORY = [
   },
 ]
 
+export type StoryItem = (typeof STORY)[number]
+
 export const DETAILS = [
   {
     icon: "♡",
@@ -75,6 +77,8 @@ export const DETAILS = [
     line3: "Celebrate in elegance",
   },
 ]
+
+export type DetailItem = (typeof DETAILS)[number]
 
 export type GiftPreference = {
   id: string
@@ -231,6 +235,32 @@ export async function fetchInvitees(): Promise<Invitee[]> {
   }
 
   return []
+}
+
+async function fetchSheetCollection<T>(
+  action: string,
+  key: string,
+): Promise<T[]> {
+  const sheetUrl = import.meta.env.VITE_SHEETS_WEB_APP_URL as string | undefined
+  if (!sheetUrl) return []
+
+  try {
+    const response = await fetch(`${sheetUrl}?action=${action}`)
+    if (!response.ok) return []
+
+    const parsed = (await response.json()) as Record<string, unknown>
+    return Array.isArray(parsed[key]) ? (parsed[key] as T[]) : []
+  } catch {
+    return []
+  }
+}
+
+export function fetchStory(): Promise<StoryItem[]> {
+  return fetchSheetCollection<StoryItem>("story", "story")
+}
+
+export function fetchDetails(): Promise<DetailItem[]> {
+  return fetchSheetCollection<DetailItem>("details", "details")
 }
 
 export function buildInviteLink(inviteeId: string) {

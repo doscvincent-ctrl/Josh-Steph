@@ -1,6 +1,15 @@
-import { DETAILS, P } from "../data/siteData"
+import { useEffect, useState } from "react"
+import { DETAILS, fetchDetails, P, type DetailItem } from "../data/siteData"
 
 export function Details() {
+  const [details, setDetails] = useState<DetailItem[]>(DETAILS)
+
+  useEffect(() => {
+    fetchDetails().then((loadedDetails) => {
+      if (loadedDetails.length > 0) setDetails(loadedDetails)
+    })
+  }, [])
+
   return (
     <section
       id="details"
@@ -29,7 +38,7 @@ export function Details() {
         </div>
 
         <div className="grid sm:grid-cols-2 gap-6">
-          {DETAILS.map((d) => (
+          {details.map((d) => (
             <div
               key={d.label}
               className="text-center p-8 transition-colors"

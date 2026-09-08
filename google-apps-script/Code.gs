@@ -1,6 +1,8 @@
 const INVITEES_SHEET_NAME = "Invitees"
 const WISHLIST_SHEET_NAME = "Wishlist"
 const ENTOURAGE_SHEET_NAME = "Entourage"
+const STORY_SHEET_NAME = "Story"
+const DETAILS_SHEET_NAME = "Details"
 
 // Each invited person has their own row.
 // People belonging to the same invitation share the same Code.
@@ -17,6 +19,8 @@ const ENTOURAGE_SHEET_NAME = "Entourage"
 const INVITEE_HEADERS = ["Code", "Name", "Email", "Attendance", "Message"]
 const WISHLIST_HEADERS = ["Id", "Title", "Description", "Category", "Link", "QR Code"]
 const ENTOURAGE_HEADERS = ["Name", "Role"]
+const STORY_HEADERS = ["Year", "Title", "Body"]
+const DETAILS_HEADERS = ["Icon", "Label", "Line 1", "Line 2", "Line 3"]
 
 function doGet(e) {
   const action = String(
@@ -46,6 +50,20 @@ function doGet(e) {
     })
   }
 
+  if (action === "story") {
+    return jsonResponse({
+      ok: true,
+      story: getStory(spreadsheet),
+    })
+  }
+
+  if (action === "details") {
+    return jsonResponse({
+      ok: true,
+      details: getDetails(spreadsheet),
+    })
+  }
+
   return jsonResponse({
     ok: true,
     invitees: getInvitees(spreadsheet),
@@ -70,6 +88,7 @@ function doPost(e) {
   const submittedCode = String(data.guestId || data.code || "")
     .trim()
     .toLowerCase()
+  const submittedEmail = String(data.email || "").trim()
 
   if (!submittedCode) {
     return jsonResponse({
@@ -155,6 +174,13 @@ function doPost(e) {
     })
   }
 
+  if (!submittedEmail) {
+    return jsonResponse({
+      ok: false,
+      message: "An email address is required.",
+    })
+  }
+
   // Update each person's own row according to the checkbox selection.
   partyRows.forEach((guest) => {
     const submittedGuest = attendingGuests.find(
@@ -179,58 +205,43 @@ function doPost(e) {
     }
   })
 
-  // Send one confirmation email per unique email address.
-  const uniqueEmails = {}
+  // Send the confirmation to the address entered in the RSVP form.
+  try {
+    const attendingNames = partyRows
+      .filter((guest) => {
+        const submittedGuest = attendingGuests.find(
+          (item) =>
+            item &&
+            normalizeName(item.name) === normalizeName(guest.name),
+        )
 
-  partyRows.forEach((guest) => {
-    if (guest.email) {
-      uniqueEmails[guest.email.toLowerCase()] = guest.email
-    }
-  })
-
-  Object.keys(uniqueEmails).forEach((emailKey) => {
-    const email = uniqueEmails[emailKey]
-
-    try {
-      const attendingNames = partyRows
-        .filter((guest) => {
-          const submittedGuest = attendingGuests.find(
-            (item) =>
-              item &&
-              normalizeName(item.name) === normalizeName(guest.name),
-          )
-
-          return !!(submittedGuest && submittedGuest.attending)
-        })
-        .map((guest) => guest.name)
-        .filter(Boolean)
-
-      const firstName =
-        partyRows.find(
-          (guest) => guest.email.toLowerCase() === emailKey,
-        )?.name || "guest"
-
-      MailApp.sendEmail({
-        to: email,
-        subject: "RSVP confirmation",
-        htmlBody: [
-          `<p>Dear ${escapeHtml(firstName)},</p>`,
-          "<p>Thank you for responding to our wedding invitation.</p>",
-          "<p><strong>Guests attending:</strong></p>",
-          attendingNames.length
-            ? `<ul>${attendingNames
-                .map((name) => `<li>${escapeHtml(name)}</li>`)
-                .join("")}</ul>`
-            : "<p>No guests will be attending.</p>",
-          "<p>We look forward to celebrating with you.</p>",
-        ].join(""),
+        return !!(submittedGuest && submittedGuest.attending)
       })
-    } catch (error) {
-      console.error(
-        `RSVP saved, but confirmation email failed: ${error}`,
-      )
-    }
-  })
+      .map((guest) => guest.name)
+      .filter(Boolean)
+
+    const firstName = partyRows[0]?.name || "guest"
+
+    MailApp.sendEmail({
+      to: submittedEmail,
+      subject: "RSVP confirmation",
+      htmlBody: [
+        `<p>Dear ${escapeHtml(firstName)},</p>`,
+        "<p>Thank you for responding to our wedding invitation.</p>",
+        "<p><strong>Guests attending:</strong></p>",
+        attendingNames.length
+          ? `<ul>${attendingNames
+              .map((name) => `<li>${escapeHtml(name)}</li>`)
+              .join("")}</ul>`
+          : "<p>No guests will be attending.</p>",
+        "<p>We look forward to celebrating with you.</p>",
+      ].join(""),
+    })
+  } catch (error) {
+    console.error(
+      `RSVP saved, but confirmation email failed: ${error}`,
+    )
+  }
 
   return jsonResponse({
     ok: true,
@@ -345,6 +356,8 @@ function ensureWeddingSheets(spreadsheet) {
     [INVITEES_SHEET_NAME, INVITEE_HEADERS],
     [WISHLIST_SHEET_NAME, WISHLIST_HEADERS],
     [ENTOURAGE_SHEET_NAME, ENTOURAGE_HEADERS],
+    [STORY_SHEET_NAME, STORY_HEADERS],
+    [DETAILS_SHEET_NAME, DETAILS_HEADERS],
   ]
 
   sheetDefinitions.forEach(([name, headers]) => {
@@ -419,6 +432,72 @@ function getEntourage(spreadsheet) {
     return [{
       name,
       role: String(record.role || "").trim(),
+    }]
+  })
+}
+
+function getStory(spreadsheet) {
+  const sheet =
+    spreadsheet.getSheetByName(STORY_SHEET_NAME) ||
+    spreadsheet.insertSheet(STORY_SHEET_NAME)
+  ensureHeaders(sheet, STORY_HEADERS)
+
+  const rows = sheet.getDataRange().getValues()
+  if (rows.length <= 1) return []
+
+  const headers = rows[0].map((header) =>
+    String(header || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ""),
+  )
+
+  return rows.slice(1).flatMap((row) => {
+    const record = {}
+    headers.forEach((header, index) => {
+      record[header] = row[index] ?? ""
+    })
+
+    const year = String(record.year || "").trim()
+    const title = String(record.title || "").trim()
+    const body = String(record.body || record.description || "").trim()
+    if (!year || !title || !body) return []
+
+    return [{ year, title, body }]
+  })
+}
+
+function getDetails(spreadsheet) {
+  const sheet =
+    spreadsheet.getSheetByName(DETAILS_SHEET_NAME) ||
+    spreadsheet.insertSheet(DETAILS_SHEET_NAME)
+  ensureHeaders(sheet, DETAILS_HEADERS)
+
+  const rows = sheet.getDataRange().getValues()
+  if (rows.length <= 1) return []
+
+  const headers = rows[0].map((header) =>
+    String(header || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ""),
+  )
+
+  return rows.slice(1).flatMap((row) => {
+    const record = {}
+    headers.forEach((header, index) => {
+      record[header] = row[index] ?? ""
+    })
+
+    const label = String(record.label || "").trim()
+    if (!label) return []
+
+    return [{
+      icon: String(record.icon || "").trim(),
+      label,
+      line1: String(record.line1 || "").trim(),
+      line2: String(record.line2 || "").trim(),
+      line3: String(record.line3 || "").trim(),
     }]
   })
 }

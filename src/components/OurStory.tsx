@@ -1,6 +1,15 @@
-import { P, STORY } from "../data/siteData"
+import { useEffect, useState } from "react"
+import { fetchStory, P, STORY, type StoryItem } from "../data/siteData"
 
 export function OurStory() {
+  const [story, setStory] = useState<StoryItem[]>(STORY)
+
+  useEffect(() => {
+    fetchStory().then((loadedStory) => {
+      if (loadedStory.length > 0) setStory(loadedStory)
+    })
+  }, [])
+
   return (
     <section
       id="our-story"
@@ -40,7 +49,7 @@ export function OurStory() {
           />
 
           <div className="flex flex-col gap-16">
-            {STORY.map((item, i) => (
+            {story.map((item, i) => (
               <div
                 key={item.year}
                 className={`relative flex items-start gap-8 ${

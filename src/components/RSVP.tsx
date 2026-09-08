@@ -3,6 +3,7 @@ import { fetchInvitees, type Invitee, P } from "../data/siteData"
 
 type RSVPForm = {
   code: string
+  email: string
   attendance: string
   guestCount: number
   message: string
@@ -39,6 +40,7 @@ export function RSVP() {
   const [loadFailed, setLoadFailed] = useState(false)
   const [form, setForm] = useState<RSVPForm>({
     code: "",
+    email: "",
     attendance: "",
     guestCount: 0,
     message: "",
@@ -171,6 +173,11 @@ export function RSVP() {
       return
     }
 
+    if (!form.email.trim()) {
+      setErrorMessage("Please enter your email address.")
+      return
+    }
+
     setIsSubmitting(true)
     setErrorMessage("")
 
@@ -186,6 +193,7 @@ export function RSVP() {
         attendance: form.attendance,
         attendingGuests: JSON.stringify(attendingGuestsPayload),
         message: form.message,
+        email: form.email,
       })
 
       setSubmitted(true)
@@ -323,6 +331,24 @@ export function RSVP() {
                   : "pointer-events-none opacity-40"
               }`}
             >
+              <div className={fieldWrapClass} style={fieldStyle}>
+          <input
+            type="email"
+            value={form.email}
+            onChange={(event) => {
+              setErrorMessage("")
+              setForm((current) => ({
+                ...current,
+                email: event.target.value,
+              }))
+            }}
+            placeholder="Enter your email address"
+            className={fieldClass}
+            autoComplete="email"
+            disabled={!isUnlocked}
+            required
+          />
+        </div>
               {/* Conditional Attendance Dropdown */}
               <div className={fieldWrapClass} style={fieldStyle}>
                 <select
