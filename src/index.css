@@ -17,8 +17,8 @@ body {
   color: #1A1A1A;
 }
 
-.font-display,
-.font-script { font-family: 'Dancing Script', cursive; }
+.font-display { font-family: 'Dancing Script', cursive; }
+.font-script { font-family: 'Josefin Sans', sans-serif; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px; }
