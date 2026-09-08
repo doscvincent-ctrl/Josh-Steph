@@ -29,30 +29,11 @@ export const COUPLE_PHOTOS = Object.entries(importedImages)
     return { src, alt: `Josh and Steph ${alt}` }
   })
 
-export const STORY = [
-  {
-    year: "2019",
-    title: "First Glance",
-    body: "A crowded autumn gala, two strangers reaching for the same glass of champagne. They laughed. The world stopped.",
-  },
-  {
-    year: "2020",
-    title: "Through Lockdown",
-    body: "Long calls stretching past midnight, shared playlists, handwritten letters slipped under the door. Distance only drew them closer.",
-  },
-  {
-    year: "2022",
-    title: "The Prenup Session",
-    body: "Golden hour in the countryside — their first photoshoot together. Every frame proved they were meant to be captured side by side.",
-  },
-  {
-    year: "2024",
-    title: "The Proposal",
-    body: "Under the same oak tree from that field photo, he got down on one knee. She said yes before he even finished the question.",
-  },
-]
-
-export type StoryItem = (typeof STORY)[number]
+export type StoryItem = {
+  year: string
+  title: string
+  body: string
+}
 
 export const DETAILS = [
   {
@@ -93,28 +74,6 @@ export type EntourageMember = {
   name: string
   role: string
 }
-
-// Sheet-backed entourage data replaces these placeholders when available.
-export const ENTOURAGE: EntourageMember[] = [
-  { name: "Ava Santos", role: "Maid of Honor" },
-  { name: "Mia Reyes", role: "Bridesmaid" },
-  { name: "Daniel Cruz", role: "Best Man" },
-  { name: "Marco Flores", role: "Groomsman" },
-  { name: "Elena Santos", role: "Mother of the Bride" },
-  { name: "Victor Cruz", role: "Father of the Groom" },
-  { name: "Sofia Lim", role: "Wedding Coordinator" },
-]
-
-// These are shown until the shared Google Sheets web app provides a live list.
-// Add a `link` to send guests to a registry.
-export const GIFT_PREFERENCES: GiftPreference[] = [
-  { id: "home-fund", title: "Home Fund", description: "A little something toward making our first home our own.", category: "Our future" },
-  { id: "dining-set", title: "Dinner for Six", description: "For slow Sunday lunches and evenings shared around our table.", category: "For our home" },
-  { id: "getaway-fund", title: "A Weekend Away", description: "Help us make a memory somewhere new after the celebration.", category: "Experiences" },
-  { id: "kitchen-essentials", title: "Kitchen Essentials", description: "The thoughtful tools behind many future meals made together.", category: "For our home" },
-  { id: "date-night", title: "Date Night Fund", description: "Because we plan to keep choosing one another, again and again.", category: "Experiences" },
-  { id: "garden-corner", title: "A Garden Corner", description: "For a little green space we can tend and enjoy together.", category: "Our future" },
-]
 
 export type Invitee = {
   id: string

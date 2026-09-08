@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
-import { GIFT_PREFERENCES, P, type GiftPreference } from "../data/siteData"
+import { P, type GiftPreference } from "../data/siteData"
+import { Loader } from "./Loader"
 
 // Gifts share the same Google Apps Script web app and spreadsheet as RSVP.
 const SHEETS_URL = import.meta.env.VITE_SHEETS_WEB_APP_URL as string | undefined
@@ -81,14 +82,18 @@ function qrImageUrl(link: string) {
 }
 
 export function Wishlist() {
-  const [gifts, setGifts] = useState(GIFT_PREFERENCES)
+  const [gifts, setGifts] = useState<GiftPreference[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   // Tracks gift ids whose QR image failed to load, so a bad/misconfigured
   // link shows a clear message instead of a broken-image icon.
   const [brokenQr, setBrokenQr] = useState<Record<string, boolean>>({})
   const markQrBroken = (id: string) => setBrokenQr((current) => ({ ...current, [id]: true }))
 
   useEffect(() => {
-    if (!SHEETS_URL) return
+    if (!SHEETS_URL) {
+      setIsLoading(false)
+      return
+    }
 
     fetch(`${SHEETS_URL}?action=wishlist`)
       .then((response) => (response.ok ? response.json() : null))
@@ -104,8 +109,9 @@ export function Wishlist() {
         if (loaded.length) setGifts(loaded)
       })
       .catch(() => {
-        // The local list remains available if the optional database is offline.
+        // Leave the gifts empty if the optional database is offline.
       })
+      .finally(() => setIsLoading(false))
   }, [])
 
   const monetaryGifts = gifts.filter(isMonetaryGift)
@@ -127,8 +133,14 @@ export function Wishlist() {
           </p>
         </div>
 
-        {registryGifts.length > 0 && (
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {isLoading ? (
+          <div className="mt-12">
+            <Loader label="Loading gift preferences" />
+          </div>
+        ) : (
+          <>
+            {registryGifts.length > 0 && (
+              <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {registryGifts.map((gift) => (
               <article key={gift.id} className="group flex min-h-64 flex-col rounded-sm border p-6 transition-transform duration-300 hover:-translate-y-1" style={{ background: P.beige, borderColor: `${P.taupe}80` }}>
                 <div className="flex items-start justify-between">
@@ -241,8 +253,18 @@ export function Wishlist() {
           </>
         )}
 
+        {registryGifts.length === 0 && monetaryGifts.length === 0 && (
+          <p className="mt-12 text-center text-sm italic" style={{ color: P.burgundyDk }}>
+            Gift preferences are on their way — thank you for your patience.
+          </p>
+        )}
+          </>
+        )}
+
         <div className="mt-9 text-center">
-          <p className="text-sm italic" style={{ color: P.burgundy }}>A contribution toward our future together is also deeply appreciated.</p>
+          <p className="text-sm italic" style={{ color: P.burgundy }}>
+            A contribution toward our future together is also deeply appreciated.
+          </p>
         </div>
       </div>
     </section>

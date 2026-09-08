@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
-import { ENTOURAGE, P, type EntourageMember } from "../data/siteData"
+import { P, type EntourageMember } from "../data/siteData"
+import { Loader } from "./Loader"
 
 const SHEETS_URL = import.meta.env.VITE_SHEETS_WEB_APP_URL as string | undefined
 
@@ -14,10 +15,14 @@ function normalizeMember(raw: Record<string, unknown>): EntourageMember | null {
 }
 
 export function Entourage() {
-  const [people, setPeople] = useState(ENTOURAGE)
+  const [people, setPeople] = useState<EntourageMember[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (!SHEETS_URL) return
+    if (!SHEETS_URL) {
+      setIsLoading(false)
+      return
+    }
 
     fetch(`${SHEETS_URL}?action=entourage`)
       .then((response) => (response.ok ? response.json() : null))
@@ -31,13 +36,12 @@ export function Entourage() {
         if (loaded.length) setPeople(loaded)
       })
       .catch(() => {
-        // Keep the local fallback if the sheet cannot be reached.
+        // Leave the entourage empty if the sheet cannot be reached.
       })
+      .finally(() => setIsLoading(false))
   }, [])
 
   const roles = Array.from(new Set(people.map((person) => person.role || "Wedding Party")))
-
-  if (!roles.length) return null
 
   return (
     <section
@@ -69,6 +73,9 @@ export function Entourage() {
           </div>
         </div>
 
+        {isLoading ? (
+          <Loader label="Loading entourage" />
+        ) : roles.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {roles.map((role) => (
             <div
@@ -98,6 +105,14 @@ export function Entourage() {
             </div>
           ))}
         </div>
+        ) : (
+          <p
+            className="text-center text-sm italic"
+            style={{ color: `${P.black}88` }}
+          >
+            Our wedding party details are coming soon.
+          </p>
+        )}
       </div>
     </section>
   )

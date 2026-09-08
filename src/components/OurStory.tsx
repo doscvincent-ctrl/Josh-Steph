@@ -1,13 +1,25 @@
 import { useEffect, useState } from "react"
-import { fetchStory, P, STORY, type StoryItem } from "../data/siteData"
+import { fetchStory, P, type StoryItem } from "../data/siteData"
+import { Loader } from "./Loader"
 
 export function OurStory() {
-  const [story, setStory] = useState<StoryItem[]>(STORY)
+  const [story, setStory] = useState<StoryItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetchStory().then((loadedStory) => {
-      if (loadedStory.length > 0) setStory(loadedStory)
-    })
+    let active = true
+
+    fetchStory()
+      .then((loadedStory) => {
+        if (active) setStory(loadedStory)
+      })
+      .finally(() => {
+        if (active) setIsLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
   }, [])
 
   return (
@@ -40,6 +52,9 @@ export function OurStory() {
           </div>
         </div>
 
+        {isLoading ? (
+          <Loader label="Loading our story" />
+        ) : story.length > 0 ? (
         <div className="relative">
           <div
             className="absolute left-1/2 -translate-x-px top-0 bottom-0 w-px"
@@ -86,6 +101,14 @@ export function OurStory() {
             ))}
           </div>
         </div>
+        ) : (
+          <p
+            className="pb-4 text-center text-sm italic"
+            style={{ color: `${P.black}88` }}
+          >
+            The story of how we began is on its way — check back soon.
+          </p>
+        )}
       </div>
     </section>
   )
