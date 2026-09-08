@@ -14,7 +14,9 @@ function normalizeGift(raw: Record<string, unknown>): GiftPreference | null {
     description: String(raw.description ?? raw.details ?? ""),
     category: String(raw.category ?? "For our home"),
     link: String(raw.link ?? raw.url ?? ""),
-    qrCode: String(raw.qrCode ?? raw.qrcode ?? raw.qr_code ?? ""),
+    qrCode: String(
+      raw.qrCode ?? raw.qrcode ?? raw.qr_code ?? raw["QR Code"] ?? "",
+    ),
   }
 }
 

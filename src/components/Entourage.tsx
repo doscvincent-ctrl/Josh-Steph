@@ -90,7 +90,7 @@ export function Entourage() {
                 {people
                   .filter((person) => (person.role || "Wedding Party") === role)
                   .map((person) => (
-                    <p key={person.name} className="text-base font-medium tracking-wide" style={{ color: P.burgundy }}>
+                    <p key={person.name} className="text-base font-normal tracking-wide" style={{ color: P.black }}>
                       {person.name}
                     </p>
                   ))}
