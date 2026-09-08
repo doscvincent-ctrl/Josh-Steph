@@ -15,7 +15,7 @@ const ENTOURAGE_SHEET_NAME = "Entourage"
 // party is determined by how many rows have the same Code.
 
 const INVITEE_HEADERS = ["Code", "Name", "Email", "Attendance", "Message"]
-const WISHLIST_HEADERS = ["Id", "Title", "Description", "Category", "Link"]
+const WISHLIST_HEADERS = ["Id", "Title", "Description", "Category", "Link", "QR Code"]
 const ENTOURAGE_HEADERS = ["Name", "Role"]
 
 function doGet(e) {
@@ -386,6 +386,7 @@ function getWishlist(spreadsheet) {
       description: String(record.description || ""),
       category: String(record.category || "For our home"),
       link: String(record.link || ""),
+      qrCode: String(record.qrcode || ""),
     }]
   })
 }

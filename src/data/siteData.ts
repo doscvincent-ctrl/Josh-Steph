@@ -82,6 +82,7 @@ export type GiftPreference = {
   description: string
   category: string
   link?: string
+  qrCode?: string
 }
 
 export type EntourageMember = {

@@ -80,7 +80,7 @@ export function Entourage() {
               }}
             >
               <p
-                className="text-xs tracking-[0.22em] uppercase mb-5 text-center"
+                className="font-display text-3xl mb-5 text-center"
                 style={{ color: P.burgundy }}
               >
                 {role}

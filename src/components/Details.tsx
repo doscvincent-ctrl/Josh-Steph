@@ -51,7 +51,7 @@ export function Details() {
                 {d.icon}
               </div>
               <p
-                className="text-xs tracking-[0.25em] uppercase mb-4"
+                className="font-display text-3xl mb-4"
                 style={{ color: P.pink }}
               >
                 {d.label}
@@ -81,7 +81,7 @@ export function Details() {
           style={{ border: `1px solid ${P.pink}30` }}
         >
           <p
-            className="text-xs tracking-[0.2em] uppercase mb-2"
+            className="font-display text-3xl mb-2"
             style={{ color: `${P.pink}99` }}
           >
             Location

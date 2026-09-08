@@ -59,7 +59,7 @@ export function OurStory() {
                     {item.year}
                   </span>
                   <h3
-                    className="text-base font-semibold tracking-wide mb-2"
+                    className="font-display text-3xl mb-2"
                     style={{ color: P.burgundy }}
                   >
                     {item.title}

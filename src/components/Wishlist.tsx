@@ -14,6 +14,7 @@ function normalizeGift(raw: Record<string, unknown>): GiftPreference | null {
     description: String(raw.description ?? raw.details ?? ""),
     category: String(raw.category ?? "For our home"),
     link: String(raw.link ?? raw.url ?? ""),
+    qrCode: String(raw.qrCode ?? raw.qrcode ?? raw.qr_code ?? ""),
   }
 }
 
@@ -34,6 +35,15 @@ function externalUrl(link: string) {
   return /^https?:/i.test(trimmed)
     ? trimmed
     : `https://${trimmed.replace(/^\/+/, "")}`
+}
+
+function qrImageUrl(link: string) {
+  const url = externalUrl(link)
+  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/i)
+
+  return driveMatch
+    ? `https://drive.google.com/uc?export=view&id=${driveMatch[1]}`
+    : url
 }
 
 export function Wishlist() {
@@ -86,6 +96,14 @@ export function Wishlist() {
               <div className="mt-auto pt-8">
                 <h3 className="text-base font-semibold tracking-wide" style={{ color: P.black }}>{gift.title}</h3>
                 <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>{gift.description}</p>
+                {gift.qrCode && (
+                  <div className="mt-5 border p-2" style={{ background: "white", borderColor: `${P.taupe}80` }}>
+                    <img src={qrImageUrl(gift.qrCode)} alt={`QR code for ${gift.title}`} className="mx-auto aspect-square w-32 object-contain" />
+                    <p className="mt-2 text-center text-[0.6rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
+                      Scan to send a gift
+                    </p>
+                  </div>
+                )}
                 {gift.link && (
                   <a href={externalUrl(gift.link)} target="_blank" rel="noreferrer" className="mt-5 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70" style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}>
                     View gift ↗
