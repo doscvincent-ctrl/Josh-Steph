@@ -127,6 +127,45 @@ export function Wishlist() {
           </p>
         </div>
 
+        {registryGifts.length > 0 && (
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {registryGifts.map((gift) => (
+              <article key={gift.id} className="group flex min-h-64 flex-col rounded-sm border p-6 transition-transform duration-300 hover:-translate-y-1" style={{ background: P.beige, borderColor: `${P.taupe}80` }}>
+                <div className="flex items-start justify-between">
+                  <GiftIcon />
+                  <span className="text-[0.63rem] uppercase tracking-[0.17em]" style={{ color: P.burgundy }}>{gift.category}</span>
+                </div>
+                <div className="mt-auto pt-8">
+                  <h3 className="text-base font-semibold tracking-wide" style={{ color: P.black }}>{gift.title}</h3>
+                  <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>{gift.description}</p>
+                  {gift.qrCode && !brokenQr[gift.id] && (
+                    <div className="mt-5 border p-2" style={{ background: "white", borderColor: `${P.taupe}80` }}>
+                      <img
+                        src={qrImageUrl(gift.qrCode)}
+                        alt={`QR code for ${gift.title}`}
+                        className="mx-auto aspect-square w-32 object-contain"
+                        onError={() => markQrBroken(gift.id)}
+                      />
+                      <p className="mt-2 text-center text-[0.6rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
+                        Scan to send a gift
+                      </p>
+                    </div>
+                  )}
+                  {gift.qrCode && brokenQr[gift.id] && (
+                    <p className="mt-5 text-xs italic" style={{ color: P.burgundyDk }}>
+                      QR code unavailable — check the sharing settings on the linked image.
+                    </p>
+                  )}
+                  {gift.link && (
+                    <a href={externalUrl(gift.link)} target="_blank" rel="noreferrer" className="mt-5 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70" style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}>
+                      View gift ↗
+                    </a>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
         {/* Featured monetary-gift QR section — pulled out of the regular
             grid so the QR code is large enough to scan comfortably, and
             labeled with its own subheading so it reads as a distinct group. */}
@@ -188,46 +227,6 @@ export function Wishlist() {
               ))}
             </div>
           </>
-        )}
-
-        {registryGifts.length > 0 && (
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {registryGifts.map((gift) => (
-              <article key={gift.id} className="group flex min-h-64 flex-col rounded-sm border p-6 transition-transform duration-300 hover:-translate-y-1" style={{ background: P.beige, borderColor: `${P.taupe}80` }}>
-                <div className="flex items-start justify-between">
-                  <GiftIcon />
-                  <span className="text-[0.63rem] uppercase tracking-[0.17em]" style={{ color: P.burgundy }}>{gift.category}</span>
-                </div>
-                <div className="mt-auto pt-8">
-                  <h3 className="text-base font-semibold tracking-wide" style={{ color: P.black }}>{gift.title}</h3>
-                  <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>{gift.description}</p>
-                  {gift.qrCode && !brokenQr[gift.id] && (
-                    <div className="mt-5 border p-2" style={{ background: "white", borderColor: `${P.taupe}80` }}>
-                      <img
-                        src={qrImageUrl(gift.qrCode)}
-                        alt={`QR code for ${gift.title}`}
-                        className="mx-auto aspect-square w-32 object-contain"
-                        onError={() => markQrBroken(gift.id)}
-                      />
-                      <p className="mt-2 text-center text-[0.6rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
-                        Scan to send a gift
-                      </p>
-                    </div>
-                  )}
-                  {gift.qrCode && brokenQr[gift.id] && (
-                    <p className="mt-5 text-xs italic" style={{ color: P.burgundyDk }}>
-                      QR code unavailable — check the sharing settings on the linked image.
-                    </p>
-                  )}
-                  {gift.link && (
-                    <a href={externalUrl(gift.link)} target="_blank" rel="noreferrer" className="mt-5 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70" style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}>
-                      View gift ↗
-                    </a>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
         )}
 
         <div className="mt-9 text-center">
