@@ -92,21 +92,30 @@ export function Entourage() {
                 {group.label}
               </p>
 
-              <div className="space-y-4">
-                {group.people.map((person) => (
-                  <div key={person.name} className="text-center">
+              <div className="space-y-6">
+                {Array.from(new Set(group.people.map((person) => person.role))).map((role) => (
+                  <div key={role} className="text-center">
+                    {role && (
+                      <p
+                        className="text-xs uppercase tracking-[0.18em]"
+                        style={{ color: P.taupe }}
+                      >
+                        {role}
+                      </p>
+                    )}
+                    <div className={role ? "mt-2 space-y-1.5" : "space-y-1.5"}>
+                      {group.people
+                        .filter((person) => person.role === role)
+                        .map((person) => (
                     <p
+                      key={person.name}
                       className="font-display text-xl"
                       style={{ color: P.burgundy }}
                     >
                       {person.name}
                     </p>
-                    <p
-                      className="text-xs uppercase tracking-[0.18em] mt-1"
-                      style={{ color: P.taupe }}
-                    >
-                      {person.role}
-                    </p>
+                        ))}
+                    </div>
                   </div>
                 ))}
               </div>

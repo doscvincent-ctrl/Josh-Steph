@@ -328,6 +328,16 @@ function setupWeddingSheets() {
   }
 
   ensureWeddingSheets(spreadsheet)
+  removeLegacyGiftReservationsSheet(spreadsheet)
+}
+
+// Removes the tab used by the former gift-reservation feature. Run
+// setupWeddingSheets from the Apps Script editor to apply this cleanup.
+function removeLegacyGiftReservationsSheet(spreadsheet) {
+  const legacySheet = spreadsheet.getSheetByName("Gift Reservations")
+  if (legacySheet) {
+    spreadsheet.deleteSheet(legacySheet)
+  }
 }
 
 function ensureWeddingSheets(spreadsheet) {
