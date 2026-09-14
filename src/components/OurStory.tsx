@@ -69,7 +69,7 @@ export function OurStory() {
                   <div className="relative z-10 flex justify-center mb-8">
                     <div
                       className="flex items-center justify-center">
-                      <span className="font-bold" style={{ color: P.burgundy, fontSize: "1.25rem", fontWeight: 900, WebkitTextStroke: "0.35px currentColor" }}>
+                      <span className="font-display font-bold" style={{ color: P.burgundy, fontSize: "1.25rem", fontWeight: 900, WebkitTextStroke: "0.35px currentColor" }}>
                         {item.year}
                       </span>
                     </div>
