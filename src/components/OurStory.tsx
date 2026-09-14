@@ -68,14 +68,7 @@ export function OurStory() {
                 <div key={item.year} className="relative">
                   <div className="relative z-10 flex justify-center mb-8">
                     <div
-                      className="flex items-center justify-center rounded-full"
-                      style={{
-                        width: 68,
-                        height: 68,
-                        background: P.beige,
-                        border: `1px solid ${P.taupe}`,
-                      }}
-                    >
+                      className="flex items-center justify-center">
                       <span className="font-display font-bold" style={{ color: P.burgundy, fontSize: "1.25rem", fontWeight: 900, WebkitTextStroke: "0.35px currentColor" }}>
                         {item.year}
                       </span>
