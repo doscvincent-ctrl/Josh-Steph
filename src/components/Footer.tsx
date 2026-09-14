@@ -28,7 +28,7 @@ export function Footer() {
         className="text-xs tracking-[0.15em]"
         style={{ color: "rgba(255,255,255,0.3)" }}
       >
-        Made with love · Tagaytay City, Philippines
+        Fruella’s Events Place · Tagaytay City, Philippines
       </p>
     </footer>
   )

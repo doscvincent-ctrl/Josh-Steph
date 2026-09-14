@@ -100,7 +100,7 @@ export function OurStory() {
                         &ldquo;{item.heSaid}&rdquo;
                       </blockquote>
                       <p className="mt-4 text-xs" style={{ color: `${P.black}88` }}>
-                        James, {item.year}
+                        Josh, {item.year}
                       </p>
                     </div>
 
@@ -118,7 +118,7 @@ export function OurStory() {
                         &ldquo;{item.sheSaid}&rdquo;
                       </blockquote>
                       <p className="mt-4 text-xs" style={{ color: `${P.black}88` }}>
-                        Eleanor, {item.year}
+                        Steph, {item.year}
                       </p>
                     </div>
                   </div>
