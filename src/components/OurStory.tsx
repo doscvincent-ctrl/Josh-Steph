@@ -70,13 +70,13 @@ export function OurStory() {
                     <div
                       className="flex items-center justify-center rounded-full"
                       style={{
-                        width: 68,
-                        height: 68,
-                        background: P.beige,
-                        border: `1px solid ${P.taupe}`,
+                        width: 76,
+                        height: 76,
+                        background: P.champagne,
+                        border: `2px solid ${P.burgundy}`,
                       }}
                     >
-                      <span className="font-display font-bold" style={{ color: P.taupe, fontSize: "1.1rem", fontWeight: 900, WebkitTextStroke: "0.35px currentColor" }}>
+                      <span className="font-display font-bold" style={{ color: P.burgundy, fontSize: "1.25rem", fontWeight: 900, WebkitTextStroke: "0.35px currentColor" }}>
                         {item.year}
                       </span>
                     </div>
