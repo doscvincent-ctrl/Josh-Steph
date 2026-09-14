@@ -3,6 +3,7 @@ const WISHLIST_SHEET_NAME = "Wishlist"
 const ENTOURAGE_SHEET_NAME = "Entourage"
 const STORY_SHEET_NAME = "Story"
 const DETAILS_SHEET_NAME = "Details"
+const GIFT_RESERVATIONS_SHEET_NAME = "Gift Reservations"
 
 // Each invited person has their own row.
 // People belonging to the same invitation share the same Code.
@@ -21,6 +22,14 @@ const WISHLIST_HEADERS = ["Id", "Title", "Description", "Category", "Link", "QR 
 const ENTOURAGE_HEADERS = ["Name", "Role"]
 const STORY_HEADERS = ["Year", "He Said", "She Said"]
 const DETAILS_HEADERS = ["Icon", "Label", "Line 1", "Line 2", "Line 3"]
+const GIFT_RESERVATIONS_HEADERS = [
+  "Gift Id",
+  "Gift Title",
+  "Guest Name",
+  "Guest Email",
+  "Message",
+  "Reserved At",
+]
 
 function doGet(e) {
   const action = String(
@@ -78,6 +87,10 @@ function doPost(e) {
   const data = parseFormData(e)
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
   ensureWeddingSheets(spreadsheet)
+
+  if (String(data.action || "").trim().toLowerCase() === "reserve-gift") {
+    return reserveGift(spreadsheet, data)
+  }
 
   const sheet =
     spreadsheet.getSheetByName(INVITEES_SHEET_NAME) ||
@@ -260,6 +273,65 @@ function doPost(e) {
   })
 }
 
+function reserveGift(spreadsheet, data) {
+  const giftId = String(data.giftId || "").trim()
+  const giftTitle = String(data.giftTitle || "").trim()
+  const guestName = String(data.guestName || "").trim()
+  const guestEmail = String(data.guestEmail || "").trim()
+  const message = String(data.message || "").trim()
+
+  if (!giftId || !giftTitle || !guestName || !guestEmail) {
+    return jsonResponse({
+      ok: false,
+      message: "Gift, guest name, and email are required.",
+    })
+  }
+
+  const sheet = spreadsheet.getSheetByName(GIFT_RESERVATIONS_SHEET_NAME)
+  const rows = sheet.getDataRange().getValues()
+  const headers = rows[0].map((header) =>
+    String(header || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ""),
+  )
+  const giftIdCol = headers.indexOf("giftid")
+
+  if (giftIdCol === -1) {
+    return jsonResponse({
+      ok: false,
+      message: "The Gift Reservations sheet is missing its Gift Id column.",
+    })
+  }
+
+  const alreadyReserved = rows.slice(1).some(
+    (row) => String(row[giftIdCol] || "").trim() === giftId,
+  )
+
+  if (alreadyReserved) {
+    return jsonResponse({
+      ok: false,
+      reserved: true,
+      message: "That gift has already been reserved.",
+    })
+  }
+
+  sheet.appendRow([
+    giftId,
+    giftTitle,
+    guestName,
+    guestEmail,
+    message,
+    new Date(),
+  ])
+
+  return jsonResponse({
+    ok: true,
+    reserved: true,
+    message: "Gift reserved successfully.",
+  })
+}
+
 function getInvitees(spreadsheet) {
   const sheet =
     spreadsheet.getSheetByName(INVITEES_SHEET_NAME) ||
@@ -356,10 +428,7 @@ function setupWeddingSheets() {
 // Removes the tab used by the former gift-reservation feature. Run
 // setupWeddingSheets from the Apps Script editor to apply this cleanup.
 function removeLegacyGiftReservationsSheet(spreadsheet) {
-  const legacySheet = spreadsheet.getSheetByName("Gift Reservations")
-  if (legacySheet) {
-    spreadsheet.deleteSheet(legacySheet)
-  }
+  // Kept as a no-op for older deployments that still call this helper.
 }
 
 function ensureWeddingSheets(spreadsheet) {
@@ -369,6 +438,7 @@ function ensureWeddingSheets(spreadsheet) {
     [ENTOURAGE_SHEET_NAME, ENTOURAGE_HEADERS],
     [STORY_SHEET_NAME, STORY_HEADERS],
     [DETAILS_SHEET_NAME, DETAILS_HEADERS],
+    [GIFT_RESERVATIONS_SHEET_NAME, GIFT_RESERVATIONS_HEADERS],
   ]
 
   sheetDefinitions.forEach(([name, headers]) => {
@@ -386,6 +456,21 @@ function getWishlist(spreadsheet) {
 
   const rows = giftsSheet.getDataRange().getValues()
   if (rows.length <= 1) return []
+
+  const reservationSheet = spreadsheet.getSheetByName(GIFT_RESERVATIONS_SHEET_NAME)
+  const reservationRows = reservationSheet.getDataRange().getValues()
+  const reservationHeaders = reservationRows[0].map((header) =>
+    String(header || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ""),
+  )
+  const reservedGiftIds = new Set(
+    reservationRows
+      .slice(1)
+      .map((row) => String(row[reservationHeaders.indexOf("giftid")] || "").trim())
+      .filter(Boolean),
+  )
 
   const headers = rows[0].map((header) =>
     String(header || "")
@@ -411,6 +496,7 @@ function getWishlist(spreadsheet) {
       category: String(record.category || "For our home"),
       link: String(record.link || ""),
       qrCode: String(record.qrcode || ""),
+      reserved: reservedGiftIds.has(id),
     }]
   })
 }

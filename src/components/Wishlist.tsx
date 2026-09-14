@@ -25,6 +25,7 @@ function normalizeGift(raw: Record<string, unknown>): GiftPreference | null {
     description: String(raw.description ?? raw.details ?? ""),
     category: String(raw.category ?? "For our home"),
     link: String(raw.link ?? raw.url ?? ""),
+    reserved: raw.reserved === true || String(raw.reserved).toLowerCase() === "true",
     qrCode: String(
       raw.qrCode ?? raw.qrcode ?? raw.qr_code ?? raw["QR Code"] ?? "",
     ),
@@ -84,6 +85,16 @@ function qrImageUrl(link: string) {
 export function Wishlist() {
   const [gifts, setGifts] = useState<GiftPreference[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [selectedGift, setSelectedGift] = useState<GiftPreference | null>(null)
+  const [reservedGiftIds, setReservedGiftIds] = useState<Set<string>>(new Set())
+  const [isSubmittingReservation, setIsSubmittingReservation] = useState(false)
+  const [reservationError, setReservationError] = useState("")
+  const [reservationSuccess, setReservationSuccess] = useState("")
+  const [reservationForm, setReservationForm] = useState({
+    guestName: "",
+    guestEmail: "",
+    message: "",
+  })
   // Tracks gift ids whose QR image failed to load, so a bad/misconfigured
   // link shows a clear message instead of a broken-image icon.
   const [brokenQr, setBrokenQr] = useState<Record<string, boolean>>({})
@@ -106,7 +117,12 @@ export function Wishlist() {
         const loaded = rows
           .map((item) => (typeof item === "object" && item ? normalizeGift(item as Record<string, unknown>) : null))
           .filter((item): item is GiftPreference => item !== null)
-        if (loaded.length) setGifts(loaded)
+        if (loaded.length) {
+          setGifts(loaded)
+          setReservedGiftIds(
+            new Set(loaded.filter((gift) => gift.reserved).map((gift) => gift.id)),
+          )
+        }
       })
       .catch(() => {
         // Leave the gifts empty if the optional database is offline.
@@ -116,6 +132,64 @@ export function Wishlist() {
 
   const monetaryGifts = gifts.filter(isMonetaryGift)
   const registryGifts = gifts.filter((gift) => !isMonetaryGift(gift))
+
+  const openReservation = (gift: GiftPreference) => {
+    if (reservedGiftIds.has(gift.id)) return
+    setReservationError("")
+    setReservationSuccess("")
+    setReservationForm({ guestName: "", guestEmail: "", message: "" })
+    setSelectedGift(gift)
+  }
+
+  const closeReservation = () => {
+    if (isSubmittingReservation) return
+    setSelectedGift(null)
+    setReservationError("")
+  }
+
+  const submitReservation = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!selectedGift) return
+
+    if (!SHEETS_URL) {
+      setReservationError("Gift reservations are not connected yet. Please contact the couple.")
+      return
+    }
+
+    setIsSubmittingReservation(true)
+    setReservationError("")
+
+    try {
+      const response = await fetch(SHEETS_URL, {
+        method: "POST",
+        body: new URLSearchParams({
+          action: "reserve-gift",
+          giftId: selectedGift.id,
+          giftTitle: selectedGift.title,
+          guestName: reservationForm.guestName.trim(),
+          guestEmail: reservationForm.guestEmail.trim(),
+          message: reservationForm.message.trim(),
+        }),
+      })
+      const payload = (await response.json()) as { ok?: boolean; message?: string }
+
+      if (!response.ok || payload.ok === false) {
+        throw new Error(payload.message || "Unable to reserve this gift right now.")
+      }
+
+      setReservedGiftIds((current) => new Set(current).add(selectedGift.id))
+      setReservationSuccess(`${selectedGift.title} is reserved. Thank you!`)
+      setSelectedGift(null)
+    } catch (error) {
+      setReservationError(
+        error instanceof Error
+          ? error.message
+          : "Unable to reserve this gift right now. Please try again.",
+      )
+    } finally {
+      setIsSubmittingReservation(false)
+    }
+  }
 
   return (
     <section id="wishlist" className="px-4 py-24" style={{ background: P.champagne }}>
@@ -141,15 +215,37 @@ export function Wishlist() {
           <>
             {registryGifts.length > 0 && (
               <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {registryGifts.map((gift) => (
-              <article key={gift.id} className="group flex min-h-64 flex-col rounded-sm border p-6 transition-transform duration-300 hover:-translate-y-1" style={{ background: P.beige, borderColor: `${P.taupe}80` }}>
+                {registryGifts.map((gift) => {
+                  const isReserved = reservedGiftIds.has(gift.id)
+
+                  return (
+              <article
+                key={gift.id}
+                role="button"
+                tabIndex={isReserved ? -1 : 0}
+                aria-disabled={isReserved}
+                onClick={() => openReservation(gift)}
+                onKeyDown={(event) => {
+                  if (!isReserved && (event.key === "Enter" || event.key === " ")) {
+                    event.preventDefault()
+                    openReservation(gift)
+                  }
+                }}
+                className={`group flex min-h-64 flex-col rounded-sm border p-6 transition-transform duration-300 ${isReserved ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:-translate-y-1"}`}
+                style={{ background: P.beige, borderColor: `${P.taupe}80` }}
+              >
                 <div className="flex items-start justify-between">
                   <GiftIcon />
-                  <span className="text-[0.63rem] uppercase tracking-[0.17em]" style={{ color: P.burgundy }}>{gift.category}</span>
+                  <span className="text-right text-[0.63rem] uppercase tracking-[0.17em]" style={{ color: isReserved ? P.taupe : P.burgundy }}>
+                    {isReserved ? "Reserved" : gift.category}
+                  </span>
                 </div>
                 <div className="mt-auto pt-8">
                   <h3 className="text-base font-semibold tracking-wide" style={{ color: P.black }}>{gift.title}</h3>
                   <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>{gift.description}</p>
+                  <p className="mt-5 text-xs uppercase tracking-[0.14em]" style={{ color: isReserved ? P.taupe : P.burgundy }}>
+                    {isReserved ? "Thank you for reserving this gift" : "Click to reserve"}
+                  </p>
                   {gift.qrCode && !brokenQr[gift.id] && (
                     <div
                       className="mx-auto mt-5 w-full max-w-[140px] overflow-hidden rounded-lg shadow-sm"
@@ -174,13 +270,14 @@ export function Wishlist() {
                     </p>
                   )}
                   {gift.link && (
-                    <a href={externalUrl(gift.link)} target="_blank" rel="noreferrer" className="mt-5 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70" style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}>
+                    <a href={externalUrl(gift.link)} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} className="mt-5 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70" style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}>
                       View gift ↗
                     </a>
                   )}
                 </div>
               </article>
-            ))}
+                  )
+                })}
           </div>
         )}
 
@@ -266,7 +363,99 @@ export function Wishlist() {
             A contribution toward our future together is also deeply appreciated.
           </p>
         </div>
+
+        {reservationSuccess && (
+          <p className="mt-5 text-center text-sm" style={{ color: P.burgundy }} role="status">
+            {reservationSuccess}
+          </p>
+        )}
       </div>
+
+      {selectedGift && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 py-8"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeReservation()
+          }}
+        >
+          <div
+            className="max-h-full w-full max-w-lg overflow-y-auto rounded-sm border p-7 shadow-2xl sm:p-9"
+            style={{ background: P.beige, borderColor: `${P.taupe}80` }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="gift-reservation-title"
+          >
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <p className="text-xs uppercase tracking-[0.16em]" style={{ color: P.taupe }}>
+                  Gift reservation
+                </p>
+                <h2 id="gift-reservation-title" className="font-display mt-2 text-3xl" style={{ color: P.black }}>
+                  {selectedGift.title}
+                </h2>
+              </div>
+              <button type="button" onClick={closeReservation} className="text-2xl leading-none" style={{ color: P.burgundy }} aria-label="Close gift reservation form">
+                &times;
+              </button>
+            </div>
+
+            <p className="mt-5 text-sm leading-6" style={{ color: P.burgundyDk }}>
+              Let us know who is reserving this gift. We will mark it as reserved for the couple.
+            </p>
+
+            <form className="mt-7 space-y-5" onSubmit={submitReservation}>
+              <label className="block text-sm" style={{ color: P.burgundyDk }}>
+                Your name
+                <input
+                  required
+                  type="text"
+                  value={reservationForm.guestName}
+                  onChange={(event) => setReservationForm((current) => ({ ...current, guestName: event.target.value }))}
+                  className="rsvp-input mt-2"
+                  style={{ color: P.black, borderColor: `${P.taupe}80` }}
+                />
+              </label>
+              <label className="block text-sm" style={{ color: P.burgundyDk }}>
+                Email address
+                <input
+                  required
+                  type="email"
+                  value={reservationForm.guestEmail}
+                  onChange={(event) => setReservationForm((current) => ({ ...current, guestEmail: event.target.value }))}
+                  className="rsvp-input mt-2"
+                  style={{ color: P.black, borderColor: `${P.taupe}80` }}
+                />
+              </label>
+              <label className="block text-sm" style={{ color: P.burgundyDk }}>
+                Note <span className="text-xs opacity-70">(optional)</span>
+                <textarea
+                  rows={3}
+                  value={reservationForm.message}
+                  onChange={(event) => setReservationForm((current) => ({ ...current, message: event.target.value }))}
+                  className="rsvp-input mt-2 resize-y"
+                  style={{ color: P.black, borderColor: `${P.taupe}80` }}
+                />
+              </label>
+
+              {reservationError && (
+                <p className="text-sm" style={{ color: P.burgundy }} role="alert">
+                  {reservationError}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmittingReservation}
+                className="w-full border px-5 py-3 text-xs uppercase tracking-[0.16em] transition-opacity hover:opacity-80 disabled:cursor-wait disabled:opacity-50"
+                style={{ background: P.burgundy, borderColor: P.burgundy, color: P.champagne }}
+              >
+                {isSubmittingReservation ? "Reserving..." : "Reserve this gift"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
