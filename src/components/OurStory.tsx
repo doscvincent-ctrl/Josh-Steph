@@ -76,7 +76,7 @@ export function OurStory() {
                         border: `1px solid ${P.taupe}`,
                       }}
                     >
-                      <span className="font-display font-bold" style={{ color: P.taupe, fontSize: "1.1rem" }}>
+                      <span className="font-display font-bold" style={{ color: P.taupe, fontSize: "1.1rem", fontWeight: 800 }}>
                         {item.year}
                       </span>
                     </div>
