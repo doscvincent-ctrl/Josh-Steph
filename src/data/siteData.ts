@@ -19,6 +19,7 @@ export const P = {
 }
 
 export const COUPLE_PHOTOS = Object.entries(importedImages)
+  .filter(([path]) => !path.endsWith("799754334_922069957193988_2678038894682432545_n.png"))
   .sort(([first], [second]) => first.localeCompare(second))
   .map(([path, src]) => {
     const filename = path.split("/").pop()?.replace(/\.[^.]+$/, "") || "photo"
