@@ -76,7 +76,7 @@ export function OurStory() {
                         border: `1px solid ${P.taupe}`,
                       }}
                     >
-                      <span className="font-display" style={{ color: P.taupe, fontSize: "1.1rem" }}>
+                      <span className="font-display font-bold" style={{ color: P.taupe, fontSize: "1.1rem" }}>
                         {item.year}
                       </span>
                     </div>
@@ -90,9 +90,26 @@ export function OurStory() {
                         borderRight: i % 2 === 1 ? `3px solid ${P.taupe}` : "none",
                       }}
                     >
-                      <p className="text-xs uppercase mb-5" style={{ color: P.taupe, letterSpacing: "0.18em" }}>
-                        He Said
-                      </p>
+                      <div className="flex items-center gap-3 mb-5">
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            background: "#2c2c2c",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <span style={{ fontSize: "0.65rem", color: "#f8f4ee", letterSpacing: "0.05em" }}>
+                            J
+                          </span>
+                        </div>
+                        <p className="text-xs uppercase" style={{ color: P.taupe, letterSpacing: "0.18em" }}>
+                          He Said
+                        </p>
+                      </div>
                       <blockquote
                         className="font-display"
                         style={{ fontSize: "1.35rem", lineHeight: 1.55, color: P.black, fontStyle: "italic" }}
@@ -108,9 +125,26 @@ export function OurStory() {
                       className={`p-8 md:p-10 ${i % 2 === 1 ? "md:order-1" : ""}`}
                       style={{ borderRight: `3px solid ${P.pink}`, textAlign: "right" }}
                     >
-                      <p className="text-xs uppercase mb-5" style={{ color: P.pink, letterSpacing: "0.18em" }}>
-                        She Said
-                      </p>
+                      <div className="flex items-center justify-end gap-3 mb-5">
+                        <p className="text-xs uppercase" style={{ color: P.pink, letterSpacing: "0.18em" }}>
+                          She Said
+                        </p>
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            background: P.pink,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <span style={{ fontSize: "0.65rem", color: "#fff", letterSpacing: "0.05em" }}>
+                            S
+                          </span>
+                        </div>
+                      </div>
                       <blockquote
                         className="font-display"
                         style={{ fontSize: "1.35rem", lineHeight: 1.55, color: P.black, fontStyle: "italic" }}
