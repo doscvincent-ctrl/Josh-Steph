@@ -91,11 +91,11 @@ export function Hero() {
             >
               <span
                 className="text-3xl font-semibold leading-none"
-                style={{ color: P.pink }}
+                style={{ color: "#ffffff" }}
               >
                 {String(value).padStart(2, "0")}
               </span>
-              <span className="text-white/50 text-[10px] tracking-[0.2em] uppercase mt-1">
+              <span className="text-white/80 text-[10px] tracking-[0.2em] uppercase mt-1">
                 {label}
               </span>
             </div>
