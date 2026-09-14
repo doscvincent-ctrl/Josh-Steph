@@ -70,10 +70,10 @@ export function OurStory() {
                     <div
                       className="flex items-center justify-center rounded-full"
                       style={{
-                        width: 76,
-                        height: 76,
-                        background: P.champagne,
-                        border: `2px solid ${P.burgundy}`,
+                        width: 68,
+                        height: 68,
+                        background: P.beige,
+                        border: `1px solid ${P.taupe}`,
                       }}
                     >
                       <span className="font-display font-bold" style={{ color: P.burgundy, fontSize: "1.25rem", fontWeight: 900, WebkitTextStroke: "0.35px currentColor" }}>
