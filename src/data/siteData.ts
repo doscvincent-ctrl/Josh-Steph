@@ -31,8 +31,8 @@ export const COUPLE_PHOTOS = Object.entries(importedImages)
 
 export type StoryItem = {
   year: string
-  title: string
-  body: string
+  heSaid: string
+  sheSaid: string
 }
 
 export const DETAILS = [
@@ -214,8 +214,26 @@ async function fetchSheetCollection<T>(
   }
 }
 
-export function fetchStory(): Promise<StoryItem[]> {
-  return fetchSheetCollection<StoryItem>("story", "story")
+type RawStoryItem = {
+  year?: string
+  heSaid?: string
+  sheSaid?: string
+  title?: string
+  body?: string
+}
+
+export async function fetchStory(): Promise<StoryItem[]> {
+  const items = await fetchSheetCollection<RawStoryItem>("story", "story")
+
+  return items.flatMap((item) => {
+    const fallback = item.body || ""
+    const heSaid = item.heSaid || fallback
+    const sheSaid = item.sheSaid || fallback
+
+    if (!item.year || (!heSaid && !sheSaid)) return []
+
+    return [{ year: item.year, heSaid, sheSaid }]
+  })
 }
 
 export function fetchDetails(): Promise<DetailItem[]> {

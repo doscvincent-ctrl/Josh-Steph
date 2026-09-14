@@ -19,7 +19,7 @@ const DETAILS_SHEET_NAME = "Details"
 const INVITEE_HEADERS = ["Code", "Name", "Email", "Attendance", "Message"]
 const WISHLIST_HEADERS = ["Id", "Title", "Description", "Category", "Link", "QR Code"]
 const ENTOURAGE_HEADERS = ["Name", "Role"]
-const STORY_HEADERS = ["Year", "Title", "Body"]
+const STORY_HEADERS = ["Year", "He Said", "She Said"]
 const DETAILS_HEADERS = ["Icon", "Label", "Line 1", "Line 2", "Line 3"]
 
 function doGet(e) {
@@ -205,6 +205,13 @@ function doPost(e) {
         .setValue(String(data.message || ""))
     }
   })
+
+  // Store the address entered for this invitation on its first guest row.
+  if (emailCol !== -1) {
+    sheet
+      .getRange(partyRows[0].rowNumber, emailCol + 1)
+      .setValue(submittedEmail)
+  }
 
   // Send the confirmation to the address entered in the RSVP form.
   let emailSent = false
@@ -463,11 +470,12 @@ function getStory(spreadsheet) {
     })
 
     const year = String(record.year || "").trim()
-    const title = String(record.title || "").trim()
-    const body = String(record.body || record.description || "").trim()
-    if (!year || !title || !body) return []
+    const fallback = String(record.body || record.description || "").trim()
+    const heSaid = String(record.hesaid || record.title || fallback).trim()
+    const sheSaid = String(record.shesaid || fallback).trim()
+    if (!year || (!heSaid && !sheSaid)) return []
 
-    return [{ year, title, body }]
+    return [{ year, heSaid, sheSaid }]
   })
 }
 
