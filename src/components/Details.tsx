@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { DETAILS, fetchDetails, P, type DetailItem } from "../data/siteData"
 
+const entourageGuideImage = `${import.meta.env.BASE_URL}imports/799754334_922069957193988_2678038894682432545_n.png`
+
 export function Details() {
   const [details, setDetails] = useState<DetailItem[]>(DETAILS)
 
@@ -83,6 +85,25 @@ export function Details() {
               </p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-10">
+          <p
+            className="mb-4 text-center text-xs uppercase tracking-[0.25em]"
+            style={{ color: P.champagne }}
+          >
+            Dress Code Reference
+          </p>
+          <div
+            className="overflow-hidden rounded-sm border"
+            style={{ borderColor: `${P.pink}60` }}
+          >
+            <img
+              src={entourageGuideImage}
+              alt="Wedding entourage dress code reference showing the beige and dusty pink color palette"
+              className="block h-auto w-full"
+            />
+          </div>
         </div>
 
         <div
