@@ -20,7 +20,7 @@ const GIFT_RESERVATIONS_SHEET_NAME = "Gift Reservations"
 const INVITEE_HEADERS = ["Code", "Name", "Email", "Attendance", "Message"]
 const WISHLIST_HEADERS = ["Id", "Title", "Description", "Category", "Link", "QR Code"]
 const ENTOURAGE_HEADERS = ["Name", "Role"]
-const STORY_HEADERS = ["Year", "He Said", "She Said"]
+const STORY_HEADERS = ["He Said", "She Said"]
 const DETAILS_HEADERS = ["Icon", "Label", "Line 1", "Line 2", "Line 3"]
 const GIFT_RESERVATIONS_HEADERS = [
   "Gift Id",
@@ -555,13 +555,12 @@ function getStory(spreadsheet) {
       record[header] = row[index] ?? ""
     })
 
-    const year = String(record.year || "").trim()
     const fallback = String(record.body || record.description || "").trim()
     const heSaid = String(record.hesaid || record.title || fallback).trim()
     const sheSaid = String(record.shesaid || fallback).trim()
-    if (!year || (!heSaid && !sheSaid)) return []
+    if (!heSaid && !sheSaid) return []
 
-    return [{ year, heSaid, sheSaid }]
+    return [{ heSaid, sheSaid }]
   })
 }
 

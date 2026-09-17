@@ -31,7 +31,6 @@ export const COUPLE_PHOTOS = Object.entries(importedImages)
   })
 
 export type StoryItem = {
-  year?: string
   heSaid: string
   sheSaid: string
 }
@@ -271,7 +270,6 @@ async function fetchSheetCollection<T>(
 }
 
 type RawStoryItem = {
-  year?: string
   heSaid?: string
   sheSaid?: string
   title?: string
@@ -288,7 +286,7 @@ export async function fetchStory(): Promise<StoryItem[]> {
 
     if (!heSaid && !sheSaid) return []
 
-    return [{ year: item.year || "", heSaid, sheSaid }]
+    return [{ heSaid, sheSaid }]
   })
 }
 
