@@ -147,6 +147,69 @@ function normalizeInvitee(raw: Record<string, unknown>): Invitee | null {
   }
 }
 
+function normalizeMember(raw: Record<string, unknown>): EntourageMember | null {
+  const name = String(raw.name ?? "").trim()
+  if (!name) return null
+
+  return {
+    name,
+    role: String(raw.role ?? "").trim(),
+  }
+}
+
+function normalizeGift(raw: Record<string, unknown>): GiftPreference | null {
+  const title = String(raw.title ?? raw.name ?? "").trim()
+  if (!title) return null
+
+  return {
+    id: String(raw.id ?? raw.slug ?? title.toLowerCase().replace(/[^a-z0-9]+/g, "-")),
+    title,
+    description: String(raw.description ?? raw.details ?? ""),
+    category: String(raw.category ?? "For our home"),
+    link: String(raw.link ?? raw.url ?? ""),
+    reserved: raw.reserved === true || String(raw.reserved).toLowerCase() === "true",
+    qrCode: String(
+      raw.qrCode ?? raw.qrcode ?? raw.qr_code ?? raw["QR Code"] ?? "",
+    ),
+  }
+}
+
+let fetchQueue: Promise<unknown> = Promise.resolve()
+const jsonCache = new Map<string, unknown>()
+
+async function queuedFetchJson(url: string, retries = 2): Promise<unknown> {
+  if (jsonCache.has(url)) {
+    return jsonCache.get(url)
+  }
+
+  const result = fetchQueue.then(async () => {
+    // Small delay between consecutive requests to Google Apps Script
+    await new Promise((r) => setTimeout(r, 150))
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const response = await fetch(url)
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`)
+        }
+        const text = await response.text()
+        if (!text || text.trim().startsWith("<")) {
+          throw new Error("Received non-JSON response from Google Apps Script")
+        }
+        const json = JSON.parse(text)
+        jsonCache.set(url, json)
+        return json
+      } catch (err) {
+        if (attempt === retries) throw err
+        await new Promise((r) => setTimeout(r, 400 * (attempt + 1)))
+      }
+    }
+  })
+
+  fetchQueue = result.catch(() => {})
+  return result
+}
+
 export async function fetchInvitees(): Promise<Invitee[]> {
   const sheetUrl = import.meta.env.VITE_SHEETS_WEB_APP_URL as string | undefined
 
@@ -162,13 +225,7 @@ export async function fetchInvitees(): Promise<Invitee[]> {
 
   for (const candidateUrl of candidateUrls) {
     try {
-      const response = await fetch(candidateUrl)
-      if (!response.ok) continue
-
-      const text = await response.text()
-      if (!text) continue
-
-      const parsed = JSON.parse(text) as unknown
+      const parsed = await queuedFetchJson(candidateUrl)
       const rows = Array.isArray(parsed)
         ? parsed
         : Array.isArray((parsed as { invitees?: unknown })?.invitees)
@@ -206,10 +263,7 @@ async function fetchSheetCollection<T>(
   if (!sheetUrl) return []
 
   try {
-    const response = await fetch(`${sheetUrl}?action=${action}`)
-    if (!response.ok) return []
-
-    const parsed = (await response.json()) as Record<string, unknown>
+    const parsed = (await queuedFetchJson(`${sheetUrl}?action=${action}`)) as Record<string, unknown>
     return Array.isArray(parsed[key]) ? (parsed[key] as T[]) : []
   } catch {
     return []
@@ -242,6 +296,32 @@ export function fetchDetails(): Promise<DetailItem[]> {
   return fetchSheetCollection<DetailItem>("details", "details")
 }
 
+export async function fetchEntourage(): Promise<EntourageMember[]> {
+  const rows = await fetchSheetCollection<Record<string, unknown>>("entourage", "entourage")
+  return rows
+    .map((item) => (typeof item === "object" && item ? normalizeMember(item) : null))
+    .filter((item): item is EntourageMember => item !== null)
+}
+
+export async function fetchWishlist(): Promise<GiftPreference[]> {
+  const sheetUrl = import.meta.env.VITE_SHEETS_WEB_APP_URL as string | undefined
+  if (!sheetUrl) return []
+
+  try {
+    const parsed = (await queuedFetchJson(`${sheetUrl}?action=wishlist`)) as Record<string, unknown>
+    const rows = Array.isArray(parsed)
+      ? parsed
+      : Array.isArray(parsed.gifts)
+        ? (parsed.gifts as Record<string, unknown>[])
+        : []
+    return rows
+      .map((item) => (typeof item === "object" && item ? normalizeGift(item) : null))
+      .filter((item): item is GiftPreference => item !== null)
+  } catch {
+    return []
+  }
+}
+
 export function buildInviteLink(inviteeId: string) {
   if (typeof window === "undefined") {
     return `/?invite=${encodeURIComponent(inviteeId)}#rsvp`
@@ -253,3 +333,4 @@ export function buildInviteLink(inviteeId: string) {
 
   return url.toString()
 }
+

@@ -1,45 +1,30 @@
 import { useEffect, useState } from "react"
-import { P, type EntourageMember } from "../data/siteData"
+import { fetchEntourage, P, type EntourageMember } from "../data/siteData"
 import { Loader } from "./Loader"
-
-const SHEETS_URL = import.meta.env.VITE_SHEETS_WEB_APP_URL as string | undefined
-
-function normalizeMember(raw: Record<string, unknown>): EntourageMember | null {
-  const name = String(raw.name ?? "").trim()
-  if (!name) return null
-
-  return {
-    name,
-    role: String(raw.role ?? "").trim(),
-  }
-}
 
 export function Entourage() {
   const [people, setPeople] = useState<EntourageMember[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (!SHEETS_URL) {
-      setIsLoading(false)
-      return
-    }
+    let active = true
 
-    fetch(`${SHEETS_URL}?action=entourage`)
-      .then((response) => (response.ok ? response.json() : null))
-      .then((payload: unknown) => {
-        const rows = Array.isArray((payload as { entourage?: unknown[] })?.entourage)
-          ? (payload as { entourage: unknown[] }).entourage
-          : []
-        const loaded = rows
-          .map((item) => typeof item === "object" && item ? normalizeMember(item as Record<string, unknown>) : null)
-          .filter((item): item is EntourageMember => item !== null)
-        if (loaded.length) setPeople(loaded)
+    fetchEntourage()
+      .then((loaded) => {
+        if (active && loaded.length) setPeople(loaded)
       })
       .catch(() => {
         // Leave the entourage empty if the sheet cannot be reached.
       })
-      .finally(() => setIsLoading(false))
+      .finally(() => {
+        if (active) setIsLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
   }, [])
+
 
   const roles = Array.from(new Set(people.map((person) => person.role || "Wedding Party")))
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { P, type GiftPreference } from "../data/siteData"
+import { fetchWishlist, P, type GiftPreference } from "../data/siteData"
 import { Loader } from "./Loader"
 
 // Gifts share the same Google Apps Script web app and spreadsheet as RSVP.
@@ -15,22 +15,6 @@ function isMonetaryGift(gift: GiftPreference) {
   return /monetary|cash/i.test(gift.category)
 }
 
-function normalizeGift(raw: Record<string, unknown>): GiftPreference | null {
-  const title = String(raw.title ?? raw.name ?? "").trim()
-  if (!title) return null
-
-  return {
-    id: String(raw.id ?? raw.slug ?? title.toLowerCase().replace(/[^a-z0-9]+/g, "-")),
-    title,
-    description: String(raw.description ?? raw.details ?? ""),
-    category: String(raw.category ?? "For our home"),
-    link: String(raw.link ?? raw.url ?? ""),
-    reserved: raw.reserved === true || String(raw.reserved).toLowerCase() === "true",
-    qrCode: String(
-      raw.qrCode ?? raw.qrcode ?? raw.qr_code ?? raw["QR Code"] ?? "",
-    ),
-  }
-}
 
 function GiftIcon() {
   return (
@@ -101,22 +85,11 @@ export function Wishlist() {
   const markQrBroken = (id: string) => setBrokenQr((current) => ({ ...current, [id]: true }))
 
   useEffect(() => {
-    if (!SHEETS_URL) {
-      setIsLoading(false)
-      return
-    }
+    let active = true
 
-    fetch(`${SHEETS_URL}?action=wishlist`)
-      .then((response) => (response.ok ? response.json() : null))
-      .then((payload: unknown) => {
-        const rows = Array.isArray(payload)
-          ? payload
-          : Array.isArray((payload as { gifts?: unknown[] })?.gifts)
-            ? (payload as { gifts: unknown[] }).gifts
-            : []
-        const loaded = rows
-          .map((item) => (typeof item === "object" && item ? normalizeGift(item as Record<string, unknown>) : null))
-          .filter((item): item is GiftPreference => item !== null)
+    fetchWishlist()
+      .then((loaded) => {
+        if (!active) return
         if (loaded.length) {
           setGifts(loaded)
           setReservedGiftIds(
@@ -125,9 +98,15 @@ export function Wishlist() {
         }
       })
       .catch(() => {
-        // Leave the gifts empty if the optional database is offline.
+        // Leave gifts empty if unavailable.
       })
-      .finally(() => setIsLoading(false))
+      .finally(() => {
+        if (active) setIsLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
   }, [])
 
   const monetaryGifts = gifts.filter(isMonetaryGift)
