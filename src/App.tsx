@@ -6,9 +6,17 @@ import { Hero } from "./components/Hero"
 import { Nav } from "./components/Nav"
 import { OurStory } from "./components/OurStory"
 import { RSVP } from "./components/RSVP"
+import { SaveTheDateScratch } from "./components/SaveTheDateScratch"
 import { Wishlist } from "./components/Wishlist"
+import { useCurrentRoute } from "./utils/router"
 
 export default function App() {
+  const { isScratchPage } = useCurrentRoute()
+
+  if (isScratchPage) {
+    return <SaveTheDateScratch />
+  }
+
   return (
     <div className="min-h-screen">
       <Nav />

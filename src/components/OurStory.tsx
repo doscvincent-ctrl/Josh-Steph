@@ -65,16 +65,7 @@ export function OurStory() {
 
             <div className="flex flex-col gap-20">
               {story.map((item, i) => (
-                <div key={item.year} className="relative">
-                  <div className="relative z-10 flex justify-center mb-8">
-                    <div
-                      className="flex items-center justify-center">
-                      <span className="font-display font-bold" style={{ color: P.burgundy, fontSize: "1.25rem", fontWeight: 900, WebkitTextStroke: "0.35px currentColor" }}>
-                        {item.year}
-                      </span>
-                    </div>
-                  </div>
-
+                <div key={i} className="relative">
                   <div className="grid md:grid-cols-2 gap-0">
                     <div
                       className={`p-8 md:p-10 ${i % 2 === 1 ? "md:order-2 md:pl-14" : "md:pr-14"}`}
@@ -110,7 +101,7 @@ export function OurStory() {
                         &ldquo;{item.heSaid}&rdquo;
                       </blockquote>
                       <p className="mt-4 text-xs" style={{ color: `${P.black}88` }}>
-                        Josh, {item.year}
+                        Josh
                       </p>
                     </div>
 
@@ -145,7 +136,7 @@ export function OurStory() {
                         &ldquo;{item.sheSaid}&rdquo;
                       </blockquote>
                       <p className="mt-4 text-xs" style={{ color: `${P.black}88` }}>
-                        Steph, {item.year}
+                        Steph
                       </p>
                     </div>
                   </div>

@@ -31,7 +31,7 @@ export const COUPLE_PHOTOS = Object.entries(importedImages)
   })
 
 export type StoryItem = {
-  year: string
+  year?: string
   heSaid: string
   sheSaid: string
 }
@@ -286,9 +286,9 @@ export async function fetchStory(): Promise<StoryItem[]> {
     const heSaid = item.heSaid || fallback
     const sheSaid = item.sheSaid || fallback
 
-    if (!item.year || (!heSaid && !sheSaid)) return []
+    if (!heSaid && !sheSaid) return []
 
-    return [{ year: item.year, heSaid, sheSaid }]
+    return [{ year: item.year || "", heSaid, sheSaid }]
   })
 }
 
