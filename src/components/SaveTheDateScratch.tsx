@@ -1,3 +1,4 @@
+import React from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { P } from "../data/siteData"
 import { useCurrentRoute } from "../utils/router"
@@ -317,121 +318,213 @@ export function SaveTheDateScratch() {
 
   return (
     <div
-      className="min-h-screen relative flex flex-col justify-between overflow-x-hidden font-script"
+      className="min-h-screen relative overflow-x-hidden font-script"
       style={{ background: P.rosewoodPink, color: P.champagne }}
     >
+      {/* 1. ENVELOPE UNOPENED / OPENING STATE (COVERS WHOLE PAGE) */}
+      {envelopeState !== "opened" && (
+        <div
+          onClick={handleOpenEnvelope}
+          className={`fixed inset-0 w-full h-[100dvh] z-30 overflow-hidden flex flex-col justify-between items-center select-none cursor-pointer transition-all duration-700 ${
+            envelopeState === "opening" ? "scale-[1.01]" : ""
+          }`}
+          style={{
+            background: P.rosewoodPinkDk,
+          }}
+        >
+          {/* Inside Envelope Lining Texture / Gradient */}
+          <div
+            className="absolute inset-0 z-0"
+            style={{
+              background: `radial-gradient(ellipse at 50% 50%, ${P.champagne}20, transparent 75%), ${P.rosewoodPink}`,
+            }}
+          />
 
-      {/* Main Container */}
-      <main className="relative z-10 max-w-4xl mx-auto w-full px-4 py-10 flex flex-col items-center text-center">
-        {/* Title Heading */}
-        <div className="mb-6">
-          <p className="text-xs uppercase tracking-[0.3em] mb-2" style={{ color: P.champagne }}>
-            Save The Date
-          </p>
-          <h1 className="font-display text-5xl md:text-7xl text-white">
-            Josh &amp; Steph
-          </h1>
-          <div className="mt-2 flex justify-center">
-            <div
-              className="h-px w-28"
-              style={{
-                background: `linear-gradient(to right, transparent, ${P.pink}, transparent)`,
-              }}
-            />
+          {/* Double Gold / Champagne Inset Border */}
+          <div className="absolute inset-3 sm:inset-6 md:inset-8 border border-[#F2D9C8]/25 rounded-md pointer-events-none z-10" />
+          <div className="absolute inset-4 sm:inset-7 md:inset-9 border border-[#F2D9C8]/15 rounded pointer-events-none z-10" />
+
+          {/* Vintage Postmark / Stamp in Top Right */}
+          <div className="absolute top-6 right-6 sm:top-9 sm:right-9 z-20 flex flex-col items-center pointer-events-none opacity-85">
+            <div className="border border-dashed border-[#F2D9C8]/60 px-3 py-2 rounded bg-[#844452]/80 backdrop-blur-sm text-center shadow-lg">
+              <span className="block text-[8px] sm:text-[9px] uppercase tracking-[0.25em] text-[#F2D9C8]/80 font-medium">
+                Wedding Mail
+              </span>
+              <span className="font-display text-xl sm:text-2xl text-[#F2D9C8] font-bold block my-0.5 leading-none">
+                J &amp; S
+              </span>
+              <span className="block text-[8px] sm:text-[9px] uppercase tracking-widest text-amber-200/90 font-semibold">
+                05·02·27
+              </span>
+            </div>
+            {/* Postal wavy stamp cancellation lines */}
+            <div className="mt-1 flex flex-col gap-0.5 opacity-40">
+              <div className="w-14 sm:w-16 h-px bg-[#F2D9C8]" />
+              <div className="w-12 sm:w-14 h-px bg-[#F2D9C8] ml-2" />
+              <div className="w-14 sm:w-16 h-px bg-[#F2D9C8]" />
+            </div>
           </div>
-        </div>
 
-        {/* 1. ENVELOPE UNOPENED / OPENING STATE */}
-        {envelopeState !== "opened" && (
-          <div className="relative w-full max-w-md my-8 flex flex-col items-center">
-            {/* 3D Envelope Container */}
-            <div
-              onClick={handleOpenEnvelope}
-              className={`group relative w-full aspect-[1.4/1] rounded-lg cursor-pointer transition-all duration-700 shadow-2xl overflow-hidden ${envelopeState === "opening" ? "scale-105" : "hover:scale-[1.02]"
-                }`}
-              style={{
-                background: P.rosewoodPinkDk,
-                border: `2px solid ${P.pink}60`,
-                boxShadow: `0 25px 50px rgba(0,0,0,0.6), 0 0 30px ${P.pink}30`,
-              }}
-            >
-              {/* Inside Envelope Lining */}
-              <div
-                className="absolute inset-0 z-0"
-                style={{
-                  background: `radial-gradient(circle at 50% 30%, ${P.champagne}25, transparent 70%), ${P.rosewoodPink}`,
-                }}
+          {/* Audio Quick Toggle in Top Left */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleAudio()
+            }}
+            className="absolute top-6 left-6 sm:top-9 sm:left-9 z-40 px-3 py-1.5 rounded-full border border-[#F2D9C8]/30 bg-[#844452]/70 backdrop-blur-md text-xs text-[#F2D9C8] flex items-center gap-1.5 hover:bg-[#844452] transition-colors shadow-md"
+          >
+            <span>{isPlayingMusic ? "⏸️" : "🎵"}</span>
+            <span className="text-[10px] sm:text-[11px] tracking-wider uppercase font-medium">
+              {isPlayingMusic ? "Pause" : "Music"}
+            </span>
+          </button>
+
+          {/* Envelope Flaps Graphic (Full screen SVG) */}
+          <svg
+            viewBox="0 0 400 280"
+            className="absolute inset-0 w-full h-full z-10 pointer-events-none"
+            preserveAspectRatio="none"
+          >
+            {/* Left Flap */}
+            <polygon
+              points="0,0 200,140 0,280"
+              fill={`${P.rosewoodPinkDk}F2`}
+              stroke={`${P.pink}35`}
+              strokeWidth="1"
+            />
+            {/* Right Flap */}
+            <polygon
+              points="400,0 200,140 400,280"
+              fill={`${P.rosewoodPinkDk}F2`}
+              stroke={`${P.pink}35`}
+              strokeWidth="1"
+            />
+            {/* Bottom Flap */}
+            <polygon
+              points="0,280 200,135 400,280"
+              fill={`${P.rosewoodPinkDk}`}
+              stroke={`${P.pink}45`}
+              strokeWidth="1.5"
+            />
+          </svg>
+
+          {/* Top Animated Flap */}
+          <div
+            className={`absolute top-0 left-0 right-0 h-1/2 z-20 origin-top transition-transform duration-1000 ${
+              envelopeState === "opening" ? "-rotate-x-180" : ""
+            }`}
+            style={{
+              transformStyle: "preserve-3d",
+            }}
+          >
+            <svg viewBox="0 0 400 140" className="w-full h-full" preserveAspectRatio="none">
+              <polygon
+                points="0,0 200,140 400,0"
+                fill={`${P.rosewoodPinkDk}`}
+                stroke={`${P.pink}60`}
+                strokeWidth="2"
               />
+            </svg>
+          </div>
 
-              {/* Envelope Flaps Graphic */}
-              <svg
-                viewBox="0 0 400 280"
-                className="absolute inset-0 w-full h-full z-10 pointer-events-none"
-                preserveAspectRatio="none"
-              >
-                {/* Left Flap */}
-                <polygon points="0,0 200,140 0,280" fill={`${P.rosewoodPinkDk}E6`} stroke={`${P.pink}30`} strokeWidth="1" />
-                {/* Right Flap */}
-                <polygon points="400,0 200,140 400,280" fill={`${P.rosewoodPinkDk}E6`} stroke={`${P.pink}30`} strokeWidth="1" />
-                {/* Bottom Flap */}
-                <polygon points="0,280 200,130 400,280" fill={`${P.rosewoodPinkDk}`} stroke={`${P.pink}40`} strokeWidth="1.5" />
-              </svg>
+          {/* Card preview sticking out when opening */}
+          <div
+            className={`absolute left-1/2 -translate-x-1/2 bottom-8 w-[88%] max-w-lg h-[70%] rounded-t-2xl z-0 transition-all duration-1000 shadow-2xl ${
+              envelopeState === "opening"
+                ? "-translate-y-36 sm:-translate-y-48 scale-105 opacity-100"
+                : "translate-y-4 opacity-40"
+            }`}
+            style={{
+              background: P.pink,
+              border: `2px solid ${P.champagne}`,
+            }}
+          />
 
-              {/* Top Animated Flap */}
+          {/* Front Envelope Typography (Top Half) */}
+          <div className="relative z-20 pt-16 sm:pt-20 md:pt-24 text-center px-4 pointer-events-none">
+            <p
+              className="text-xs sm:text-sm uppercase tracking-[0.35em] mb-2 font-medium"
+              style={{ color: P.champagne }}
+            >
+              Save The Date
+            </p>
+            <h1 className="font-display text-5xl sm:text-7xl md:text-8xl text-white drop-shadow-md">
+              Josh &amp; Steph
+            </h1>
+            <div className="mt-3 flex justify-center">
               <div
-                className={`absolute top-0 left-0 right-0 h-1/2 z-20 origin-top transition-transform duration-1000 ${envelopeState === "opening" ? "-rotate-x-180" : ""
-                  }`}
+                className="h-px w-36"
                 style={{
-                  transformStyle: "preserve-3d",
-                }}
-              >
-                <svg viewBox="0 0 400 140" className="w-full h-full" preserveAspectRatio="none">
-                  <polygon points="0,0 200,140 400,0" fill={`${P.rosewoodPinkDk}`} stroke={`${P.pink}60`} strokeWidth="2" />
-                </svg>
-              </div>
-
-              {/* Gold Wax Seal Badge */}
-              <div
-                className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center justify-center transition-all duration-500 ${envelopeState === "opening" ? "scale-150 opacity-0" : "scale-100 opacity-100 group-hover:scale-110"
-                  }`}
-              >
-                <div
-                  className="w-20 h-20 rounded-full flex flex-col items-center justify-center shadow-2xl relative"
-                  style={{
-                    background: `radial-gradient(circle at 35% 35%, #D4AF37, ${P.rosewoodPink} 90%)`,
-                    border: `3px solid ${P.champagne}`,
-                    boxShadow: "0 10px 25px rgba(0,0,0,0.7), inset 0 0 10px rgba(255,255,255,0.4)",
-                  }}
-                >
-                  <span className="font-display text-2xl text-white font-bold leading-none">J &amp; S</span>
-                  <span className="text-[8px] uppercase tracking-widest text-amber-200 mt-1">05·02·27</span>
-                </div>
-              </div>
-
-              {/* Card preview sticking out */}
-              <div
-                className={`absolute left-6 right-6 bottom-4 h-3/4 rounded-t-md z-0 transition-transform duration-1000 ${envelopeState === "opening" ? "-translate-y-24 scale-105" : "translate-y-4"
-                  }`}
-                style={{
-                  background: P.pink,
-                  border: `1px solid ${P.champagne}`,
+                  background: `linear-gradient(to right, transparent, ${P.pink}, transparent)`,
                 }}
               />
             </div>
+            <p className="mt-2 text-[11px] sm:text-xs uppercase tracking-[0.25em] text-[#F2D9C8]/80 font-light">
+              February 5, 2027 · Tagaytay City
+            </p>
+          </div>
 
-            {/* Instruction prompt */}
-            <p className="mt-6 text-sm tracking-[0.2em] uppercase text-amber-200/90 animate-pulse">
+          {/* Wax Seal in Center */}
+          <div
+            className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center justify-center transition-all duration-500 ${
+              envelopeState === "opening" ? "scale-150 opacity-0" : "scale-100 opacity-100 hover:scale-110"
+            }`}
+          >
+            {/* Soft pulsing glow aura */}
+            <div
+              className="absolute inset-0 rounded-full animate-ping opacity-25 bg-amber-300 pointer-events-none"
+              style={{ animationDuration: "3s" }}
+            />
+
+            <div
+              className="w-24 h-24 sm:w-28 sm:h-28 rounded-full flex flex-col items-center justify-center shadow-2xl relative select-none"
+              style={{
+                background: `radial-gradient(circle at 35% 35%, #D4AF37, ${P.rosewoodPink} 90%)`,
+                border: `3px solid ${P.champagne}`,
+                boxShadow: "0 15px 35px rgba(0,0,0,0.65), inset 0 0 12px rgba(255,255,255,0.45)",
+              }}
+            >
+              <span className="font-display text-3xl sm:text-4xl text-white font-bold leading-none">J &amp; S</span>
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-amber-200 mt-1 font-semibold">
+                05·02·27
+              </span>
+            </div>
+          </div>
+
+          {/* Instruction prompt (Bottom Half) */}
+          <div className="relative z-20 pb-10 sm:pb-14 text-center pointer-events-none px-4">
+            <p className="text-xs sm:text-sm tracking-[0.25em] uppercase text-amber-200/95 font-medium animate-pulse drop-shadow">
               ✉️ Tap the wax seal to open your invitation
             </p>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* 2. ENVELOPE OPENED: PHOTO SCRATCH CARD */}
-        {envelopeState === "opened" && (
-          <>
-            <p className="mb-4 text-xs uppercase tracking-[0.25em]" style={{ color: P.pink }}>
-              ✨ Scratch the foil below to reveal our date!
+      {/* 2. ENVELOPE OPENED: PHOTO SCRATCH CARD */}
+      {envelopeState === "opened" && (
+        <main className="relative z-10 max-w-4xl mx-auto w-full px-4 py-8 sm:py-12 flex flex-col items-center text-center min-h-screen justify-center">
+          {/* Title Heading */}
+          <div className="mb-5 sm:mb-6">
+            <p className="text-xs uppercase tracking-[0.3em] mb-2" style={{ color: P.champagne }}>
+              Save The Date
             </p>
+            <h1 className="font-display text-4xl sm:text-6xl md:text-7xl text-white">
+              Josh &amp; Steph
+            </h1>
+            <div className="mt-2 flex justify-center">
+              <div
+                className="h-px w-28"
+                style={{
+                  background: `linear-gradient(to right, transparent, ${P.pink}, transparent)`,
+                }}
+              />
+            </div>
+          </div>
+
+          <p className="mb-4 text-xs uppercase tracking-[0.25em]" style={{ color: P.pink }}>
+            ✨ Scratch the foil below to reveal our date!
+          </p>
 
             {/* Scratch Card Frame */}
             <div
@@ -583,9 +676,8 @@ export function SaveTheDateScratch() {
                 ✉️ View Envelope
               </button>
             </div>
-          </>
-        )}
-      </main>
+        </main>
+      )}
     </div>
   )
 }
