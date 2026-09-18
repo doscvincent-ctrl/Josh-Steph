@@ -35,31 +35,13 @@ export type StoryItem = {
   sheSaid: string
 }
 
-export const DETAILS = [
-  {
-    icon: "♡",
-    label: "Ceremony & Reception",
-    line1: "February 5, 2027 · 3:00 PM",
-    line2: "Fruella’s Events Place",
-    line3: "Tagaytay City, Philippines",
-  },
-  // {
-  //   icon: "◇",
-  //   label: "Reception",
-  //   line1: "February 5, 2027 · 5:00 PM",
-  //   line2: "Fruella’s Events Place",
-  //   line3: "Tagaytay City, Philippines",
-  // },
-  {
-    icon: "◈",
-    label: "Dress Code",
-    line1: "Black Tie Optional",
-    line2: "Burgundy & Dusty Pink",
-    line3: "Celebrate in elegance",
-  },
-]
-
-export type DetailItem = (typeof DETAILS)[number]
+export type DetailItem = {
+  icon: string
+  label: string
+  line1: string
+  line2: string
+  line3: string
+}
 
 export type GiftPreference = {
   id: string
@@ -100,35 +82,35 @@ function normalizeInvitee(raw: Record<string, unknown>): Invitee | null {
 
   const name = String(
     lookup.name ??
-      lookup.fullname ??
-      lookup.guestname ??
-      lookup.fullnameaslisted ??
-      lookup.attendee ??
-      lookup.invitee ??
-      "",
+    lookup.fullname ??
+    lookup.guestname ??
+    lookup.fullnameaslisted ??
+    lookup.attendee ??
+    lookup.invitee ??
+    "",
   ).trim()
 
   const email = String(
     lookup.email ??
-      lookup.emailaddress ??
-      lookup.guestemail ??
-      lookup.attendeeemail ??
-      "",
+    lookup.emailaddress ??
+    lookup.guestemail ??
+    lookup.attendeeemail ??
+    "",
   ).trim()
 
   // Every person has their own row, but everyone in the same party uses
   // the same Code. The Code therefore groups the rows into one invitation.
   const idValue = String(
     lookup.code ??
-      lookup.guestcode ??
-      lookup.invitecode ??
-      lookup.id ??
-      lookup.inviteid ??
-      lookup.inviteeid ??
-      lookup.guestid ??
-      lookup.slug ??
-      lookup.linkid ??
-      "",
+    lookup.guestcode ??
+    lookup.invitecode ??
+    lookup.id ??
+    lookup.inviteid ??
+    lookup.inviteeid ??
+    lookup.guestid ??
+    lookup.slug ??
+    lookup.linkid ??
+    "",
   ).trim()
 
   const attendance = String(lookup.attendance ?? "")
@@ -205,7 +187,7 @@ async function queuedFetchJson(url: string, retries = 2): Promise<unknown> {
     }
   })
 
-  fetchQueue = result.catch(() => {})
+  fetchQueue = result.catch(() => { })
   return result
 }
 
