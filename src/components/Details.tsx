@@ -1,15 +1,30 @@
 import { useEffect, useState } from "react"
-import { DETAILS, fetchDetails, P, type DetailItem } from "../data/siteData"
+import { fetchDetails, P, type DetailItem } from "../data/siteData"
+import { Loader } from "./Loader"
 
 const entourageGuideImage = `${import.meta.env.BASE_URL}imports/799754334_922069957193988_2678038894682432545_n.png`
 
 export function Details() {
-  const [details, setDetails] = useState<DetailItem[]>(DETAILS)
+  const [details, setDetails] = useState<DetailItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    fetchDetails().then((loadedDetails) => {
-      if (loadedDetails.length > 0) setDetails(loadedDetails)
-    })
+    let active = true
+
+    fetchDetails()
+      .then((loadedDetails) => {
+        if (active) setDetails(loadedDetails)
+      })
+      .catch(() => {
+        // Leave details empty if fetch fails
+      })
+      .finally(() => {
+        if (active) setIsLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
   }, [])
 
   return (
@@ -39,53 +54,74 @@ export function Details() {
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-6">
-          {details.map((d) => (
-            <div
-              key={d.label}
-              className="text-center p-8 transition-colors"
-              style={{
-                border: `1px solid ${P.pink}30`,
-                background: "rgba(196,144,144,0.08)",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.border = `1px solid ${P.pink}60`)
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.border = `1px solid ${P.pink}30`)
-              }
-            >
+        {isLoading ? (
+          <Loader label="Loading wedding details" />
+        ) : details.length > 0 ? (
+          <div className="grid sm:grid-cols-2 gap-6">
+            {details.map((d, index) => (
               <div
-                className="text-3xl mb-4"
-                style={{ color: P.pink }}
+                key={d.label || index}
+                className="text-center p-8 transition-colors"
+                style={{
+                  border: `1px solid ${P.pink}30`,
+                  background: "rgba(196,144,144,0.08)",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.border = `1px solid ${P.pink}60`)
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.border = `1px solid ${P.pink}30`)
+                }
               >
-                {d.icon}
+                {d.icon && (
+                  <div
+                    className="text-3xl mb-4"
+                    style={{ color: P.pink }}
+                  >
+                    {d.icon}
+                  </div>
+                )}
+                {d.label && (
+                  <p
+                    className="font-display text-3xl mb-4"
+                    style={{ color: P.pink }}
+                  >
+                    {d.label}
+                  </p>
+                )}
+                <div
+                  className="h-px mb-4 mx-6"
+                  style={{ background: `${P.pink}30` }}
+                />
+                {d.line1 && (
+                  <p className="text-white text-sm leading-loose">
+                    {d.line1}
+                  </p>
+                )}
+                {d.line2 && (
+                  <p
+                    className="italic text-base mt-1"
+                    style={{ color: P.champagne }}
+                  >
+                    {d.line2}
+                  </p>
+                )}
+                {d.line3 && (
+                  <p className="text-xs mt-2 tracking-wide text-white/50">
+                    {d.line3}
+                  </p>
+                )}
               </div>
-              <p
-                className="font-display text-3xl mb-4"
-                style={{ color: P.pink }}
-              >
-                {d.label}
-              </p>
-              <div
-                className="h-px mb-4 mx-6"
-                style={{ background: `${P.pink}30` }}
-              />
-              <p className="text-white text-sm leading-loose">
-                {d.line1}
-              </p>
-              <p
-                className="italic text-base mt-1"
-                style={{ color: P.champagne }}
-              >
-                {d.line2}
-              </p>
-              <p className="text-xs mt-2 tracking-wide text-white/50">
-                {d.line3}
-              </p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <p
+            className="text-center text-sm italic"
+            style={{ color: `${P.champagne}88` }}
+          >
+            Wedding details are coming soon.
+          </p>
+        )}
 
         <div className="mt-10">
           <p

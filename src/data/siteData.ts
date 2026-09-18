@@ -155,6 +155,31 @@ function normalizeGift(raw: Record<string, unknown>): GiftPreference | null {
   }
 }
 
+function normalizeDetail(raw: Record<string, unknown>): DetailItem | null {
+  const lookup = Object.entries(raw).reduce<Record<string, unknown>>(
+    (acc, [key, value]) => {
+      const normalizedKey = key
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "")
+      acc[normalizedKey] = value
+      return acc
+    },
+    {},
+  )
+
+  const icon = String(lookup.icon ?? lookup.symbol ?? lookup.emoji ?? "").trim()
+  const label = String(lookup.label ?? lookup.title ?? lookup.name ?? lookup.header ?? "").trim()
+  const line1 = String(lookup.line1 ?? lookup.detail1 ?? lookup.description1 ?? lookup.text1 ?? lookup.lineone ?? lookup.value1 ?? "").trim()
+  const line2 = String(lookup.line2 ?? lookup.detail2 ?? lookup.description2 ?? lookup.text2 ?? lookup.linetwo ?? lookup.value2 ?? "").trim()
+  const line3 = String(lookup.line3 ?? lookup.detail3 ?? lookup.description3 ?? lookup.text3 ?? lookup.linethree ?? lookup.value3 ?? "").trim()
+
+  if (!icon && !label && !line1 && !line2 && !line3) return null
+
+  return { icon, label, line1, line2, line3 }
+}
+
+
 let fetchQueue: Promise<unknown> = Promise.resolve()
 const jsonCache = new Map<string, unknown>()
 
@@ -272,8 +297,11 @@ export async function fetchStory(): Promise<StoryItem[]> {
   })
 }
 
-export function fetchDetails(): Promise<DetailItem[]> {
-  return fetchSheetCollection<DetailItem>("details", "details")
+export async function fetchDetails(): Promise<DetailItem[]> {
+  const rows = await fetchSheetCollection<Record<string, unknown>>("details", "details")
+  return rows
+    .map((item) => (typeof item === "object" && item ? normalizeDetail(item) : null))
+    .filter((item): item is DetailItem => item !== null)
 }
 
 export async function fetchEntourage(): Promise<EntourageMember[]> {
