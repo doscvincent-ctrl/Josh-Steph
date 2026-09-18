@@ -103,11 +103,11 @@ export function SaveTheDateScratch() {
 
     // Luxury foil gradient background
     const grad = ctx.createLinearGradient(0, 0, width, height)
-    grad.addColorStop(0, "#7B2937")
-    grad.addColorStop(0.25, "#A85360")
-    grad.addColorStop(0.5, "#5C1E2A")
-    grad.addColorStop(0.75, "#C49090")
-    grad.addColorStop(1, "#7B2937")
+    grad.addColorStop(0, P.rosewoodPink)
+    grad.addColorStop(0.25, "#B66C7E")
+    grad.addColorStop(0.5, P.rosewoodPinkDk)
+    grad.addColorStop(0.75, P.pink)
+    grad.addColorStop(1, P.rosewoodPink)
 
     ctx.fillStyle = grad
     ctx.fillRect(0, 0, width, height)
@@ -318,7 +318,7 @@ export function SaveTheDateScratch() {
   return (
     <div
       className="min-h-screen relative flex flex-col justify-between overflow-x-hidden font-script"
-      style={{ background: P.burgundy, color: P.champagne }}
+      style={{ background: P.rosewoodPink, color: P.champagne }}
     >
 
       {/* Main Container */}
@@ -350,7 +350,7 @@ export function SaveTheDateScratch() {
               className={`group relative w-full aspect-[1.4/1] rounded-lg cursor-pointer transition-all duration-700 shadow-2xl overflow-hidden ${envelopeState === "opening" ? "scale-105" : "hover:scale-[1.02]"
                 }`}
               style={{
-                background: P.burgundyDk,
+                background: P.rosewoodPinkDk,
                 border: `2px solid ${P.pink}60`,
                 boxShadow: `0 25px 50px rgba(0,0,0,0.6), 0 0 30px ${P.pink}30`,
               }}
@@ -359,7 +359,7 @@ export function SaveTheDateScratch() {
               <div
                 className="absolute inset-0 z-0"
                 style={{
-                  background: `radial-gradient(circle at 50% 30%, ${P.champagne}25, transparent 70%), ${P.burgundy}`,
+                  background: `radial-gradient(circle at 50% 30%, ${P.champagne}25, transparent 70%), ${P.rosewoodPink}`,
                 }}
               />
 
@@ -370,11 +370,11 @@ export function SaveTheDateScratch() {
                 preserveAspectRatio="none"
               >
                 {/* Left Flap */}
-                <polygon points="0,0 200,140 0,280" fill={`${P.burgundyDk}E6`} stroke={`${P.pink}30`} strokeWidth="1" />
+                <polygon points="0,0 200,140 0,280" fill={`${P.rosewoodPinkDk}E6`} stroke={`${P.pink}30`} strokeWidth="1" />
                 {/* Right Flap */}
-                <polygon points="400,0 200,140 400,280" fill={`${P.burgundyDk}E6`} stroke={`${P.pink}30`} strokeWidth="1" />
+                <polygon points="400,0 200,140 400,280" fill={`${P.rosewoodPinkDk}E6`} stroke={`${P.pink}30`} strokeWidth="1" />
                 {/* Bottom Flap */}
-                <polygon points="0,280 200,130 400,280" fill={`${P.burgundyDk}`} stroke={`${P.pink}40`} strokeWidth="1.5" />
+                <polygon points="0,280 200,130 400,280" fill={`${P.rosewoodPinkDk}`} stroke={`${P.pink}40`} strokeWidth="1.5" />
               </svg>
 
               {/* Top Animated Flap */}
@@ -386,7 +386,7 @@ export function SaveTheDateScratch() {
                 }}
               >
                 <svg viewBox="0 0 400 140" className="w-full h-full" preserveAspectRatio="none">
-                  <polygon points="0,0 200,140 400,0" fill={`${P.burgundyDk}`} stroke={`${P.pink}60`} strokeWidth="2" />
+                  <polygon points="0,0 200,140 400,0" fill={`${P.rosewoodPinkDk}`} stroke={`${P.pink}60`} strokeWidth="2" />
                 </svg>
               </div>
 
@@ -398,7 +398,7 @@ export function SaveTheDateScratch() {
                 <div
                   className="w-20 h-20 rounded-full flex flex-col items-center justify-center shadow-2xl relative"
                   style={{
-                    background: `radial-gradient(circle at 35% 35%, #D4AF37, ${P.burgundy} 90%)`,
+                    background: `radial-gradient(circle at 35% 35%, #D4AF37, ${P.rosewoodPink} 90%)`,
                     border: `3px solid ${P.champagne}`,
                     boxShadow: "0 10px 25px rgba(0,0,0,0.7), inset 0 0 10px rgba(255,255,255,0.4)",
                   }}
@@ -452,7 +452,7 @@ export function SaveTheDateScratch() {
                 <div
                   className="absolute inset-0"
                   style={{
-                    background: `linear-gradient(to top, ${P.burgundyDk}F0 0%, rgba(92, 30, 42, 0.35) 50%, rgba(92, 30, 42, 0.75) 100%)`,
+                    background: `linear-gradient(to top, ${P.rosewoodPinkDk}F0 0%, rgba(132, 68, 82, 0.35) 50%, rgba(132, 68, 82, 0.75) 100%)`,
                   }}
                 />
 
@@ -468,7 +468,7 @@ export function SaveTheDateScratch() {
                   <div
                     className="py-5 px-6 rounded-lg backdrop-blur-md border w-full max-w-xs shadow-lg"
                     style={{
-                      background: "rgba(123, 41, 55, 0.7)",
+                      background: "rgba(166, 94, 110, 0.7)",
                       borderColor: `${P.pink}70`,
                     }}
                   >
@@ -539,7 +539,7 @@ export function SaveTheDateScratch() {
                   className="px-6 py-2.5 text-xs uppercase tracking-[0.2em] rounded-sm transition-all duration-300 shadow-lg"
                   style={{
                     background: P.pink,
-                    color: P.burgundy,
+                    color: P.rosewoodPink,
                     fontWeight: 600,
                   }}
                 >

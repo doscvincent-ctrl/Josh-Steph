@@ -16,6 +16,8 @@ export const P = {
   beige: "#EDE0D0",
   taupe: "#C4A090",
   black: "#1A1A1A",
+  rosewoodPink: "#A65E6E",
+  rosewoodPinkDk: "#844452",
 }
 
 export const COUPLE_PHOTOS = Object.entries(importedImages)
