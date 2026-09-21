@@ -2,6 +2,9 @@ import { useEffect, useState } from "react"
 import { P } from "../data/siteData"
 import { useCurrentRoute } from "../utils/router"
 
+const Logo = `${import.meta.env.BASE_URL}imports/monogram.svg`
+
+
 export function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -37,10 +40,10 @@ export function Nav() {
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <a
             href="#"
-            className="text-sm font-semibold tracking-[0.2em] transition-opacity hover:opacity-80"
+            className="transition-opacity hover:opacity-80"
             style={{ color: P.champagne }}
           >
-            J &amp; S
+            <img src={Logo} alt="J & S" className="h-8 w-auto" />
           </a>
 
           <div className="flex items-center gap-6">
