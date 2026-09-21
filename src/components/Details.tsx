@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { fetchDetails, P, type DetailItem } from "../data/siteData"
 import { Loader } from "./Loader"
 
-const entourageGuideImage = `${import.meta.env.BASE_URL}imports/799754334_922069957193988_2678038894682432545_n.png`
+const entourageGuideImage = `${import.meta.env.BASE_URL}imports/792175530_1164564762561901_5092266169300164434_n.jpg`
 
 export function Details() {
   const [details, setDetails] = useState<DetailItem[]>([])
