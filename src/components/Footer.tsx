@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <footer
       className="py-16 px-4 text-center"
-      style={{ background: P.burgundy, borderTop: `1px solid ${P.pink}25` }}
+      style={{ background: P.rosewoodPink, borderTop: `1px solid ${P.pink}25` }}
     >
       <p
         className="text-lg font-semibold tracking-wide mb-3"

@@ -28,7 +28,7 @@ export function Nav() {
       <nav
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
         style={{
-          background: scrolled ? `${P.burgundyDk}F5` : "transparent",
+          background: scrolled ? `${P.rosewoodPinkDk}F5` : "transparent",
           backdropFilter: scrolled ? "blur(8px)" : "none",
           borderBottom: scrolled ? `1px solid ${P.pink}30` : "none",
           padding: scrolled ? "0.75rem 2rem" : "1.5rem 2rem",

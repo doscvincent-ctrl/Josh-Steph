@@ -32,7 +32,7 @@ export function Hero() {
     <section
       id="hero"
       className="relative min-h-screen flex flex-col items-center justify-center text-center px-4"
-      style={{ backgroundColor: P.burgundy }}
+      style={{ backgroundColor: P.rosewoodPink }}
     >
       <div className="absolute inset-0 overflow-hidden">
         <img
@@ -44,13 +44,6 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 flex flex-col items-center gap-5">
-        <p
-          className="text-xs uppercase tracking-widest animate-fade-up"
-          style={{ color: P.champagne, letterSpacing: "0.35em" }}
-        >
-          Together Forever
-        </p>
-
         <h1
           className="font-display text-white animate-fade-up delay-200"
           style={{ fontSize: "clamp(3rem,8vw,6rem)", lineHeight: 1.05 }}
@@ -65,12 +58,12 @@ export function Hero() {
           Steph
         </h1>
 
-        <div className="soft-divider w-48 animate-fade-up delay-400">
+        <div className="soft-divider w-60 animate-fade-up delay-400">
           <span
             className="text-xs uppercase"
             style={{ color: P.champagne, letterSpacing: "0.3em" }}
           >
-            05 · 02 · 2027
+            February 5, 2027
           </span>
         </div>
 
@@ -105,10 +98,10 @@ export function Hero() {
         <a
           href="#rsvp"
           className="mt-6 animate-fade-up delay-600 px-8 py-3 text-xs tracking-[0.25em] uppercase transition-all duration-300"
-          style={{ border: `1px solid ${P.pink}`, color: P.pink }}
+          style={{ border: `1px solid ${P.pink}`, color: "#ffffff" }}
           onMouseEnter={(e) => {
             e.currentTarget.style.background = P.pink
-            e.currentTarget.style.color = P.burgundy
+            e.currentTarget.style.color = P.rosewoodPink
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = "transparent"

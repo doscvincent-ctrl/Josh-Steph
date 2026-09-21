@@ -18,7 +18,7 @@ function isMonetaryGift(gift: GiftPreference) {
 
 function GiftIcon() {
   return (
-    <span className="flex h-11 w-11 items-center justify-center rounded-full border" style={{ borderColor: `${P.burgundy}55`, color: P.burgundy }} aria-hidden="true">
+    <span className="flex h-11 w-11 items-center justify-center rounded-full border" style={{ borderColor: `${P.rosewoodPink}55`, color: P.rosewoodPink }} aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="h-5 w-5">
         <path d="M3.5 10h17v10h-17zM2.5 6.5h19v3.5h-19zM12 6.5V20M12 6.5H8.7A2.2 2.2 0 1 1 12 3.8v2.7Zm0 0h3.3a2.2 2.2 0 1 0-3.3-2.7v2.7Z" />
       </svg>
@@ -28,7 +28,7 @@ function GiftIcon() {
 
 function MoneyIcon() {
   return (
-    <span className="flex h-12 w-12 items-center justify-center rounded-full border" style={{ borderColor: `${P.burgundy}55`, color: P.burgundy }} aria-hidden="true">
+    <span className="flex h-12 w-12 items-center justify-center rounded-full border" style={{ borderColor: `${P.rosewoodPink}55`, color: P.rosewoodPink }} aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="h-6 w-6">
         <rect x="2.5" y="6" width="19" height="12" rx="1.6" />
         <circle cx="12" cy="12" r="2.6" />
@@ -174,14 +174,14 @@ export function Wishlist() {
     <section id="wishlist" className="px-4 py-24" style={{ background: P.champagne }}>
       <div className="mx-auto max-w-5xl">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm uppercase tracking-[0.14em]" style={{ color: P.burgundy }}>
+          <p className="text-sm uppercase tracking-[0.14em]" style={{ color: P.rosewoodPink }}>
             With grateful hearts
           </p>
           <h2 className="font-display mt-2 text-4xl md:text-5xl" style={{ color: P.black }}>
             Gift Preferences
           </h2>
           <div className="soft-divider mx-auto mt-5 max-w-48" />
-          <p className="mt-6 text-sm leading-7" style={{ color: P.burgundyDk }}>
+          <p className="mt-6 text-sm leading-7" style={{ color: P.rosewoodPinkDk }}>
             Your presence is the greatest gift. For those who have asked, these are a few things that would help us begin our next chapter together.
           </p>
         </div>
@@ -215,14 +215,14 @@ export function Wishlist() {
               >
                 <div className="flex items-start justify-between">
                   <GiftIcon />
-                  <span className="text-right text-[0.63rem] uppercase tracking-[0.17em]" style={{ color: isReserved ? P.taupe : P.burgundy }}>
+                  <span className="text-right text-[0.63rem] uppercase tracking-[0.17em]" style={{ color: isReserved ? P.taupe : P.rosewoodPink }}>
                     {isReserved ? "Reserved" : gift.category}
                   </span>
                 </div>
                 <div className="mt-auto pt-8">
                   <h3 className="text-base font-semibold tracking-wide" style={{ color: P.black }}>{gift.title}</h3>
-                  <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>{gift.description}</p>
-                  <p className="mt-5 text-xs uppercase tracking-[0.14em]" style={{ color: isReserved ? P.taupe : P.burgundy }}>
+                  <p className="mt-2 text-sm leading-6" style={{ color: P.rosewoodPinkDk }}>{gift.description}</p>
+                  <p className="mt-5 text-xs uppercase tracking-[0.14em]" style={{ color: isReserved ? P.taupe : P.rosewoodPink }}>
                     {isReserved ? "Thank you for reserving this gift" : "Click to reserve"}
                   </p>
                   {gift.qrCode && !brokenQr[gift.id] && (
@@ -239,17 +239,17 @@ export function Wishlist() {
                     </div>
                   )}
                   {gift.qrCode && !brokenQr[gift.id] && (
-                    <p className="mt-2 text-center text-[0.6rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
+                    <p className="mt-2 text-center text-[0.6rem] uppercase tracking-[0.14em]" style={{ color: P.rosewoodPinkDk }}>
                       Scan to send a gift
                     </p>
                   )}
                   {gift.qrCode && brokenQr[gift.id] && (
-                    <p className="mt-5 text-xs italic" style={{ color: P.burgundyDk }}>
+                    <p className="mt-5 text-xs italic" style={{ color: P.rosewoodPinkDk }}>
                       QR code unavailable — check the sharing settings on the linked image.
                     </p>
                   )}
                   {gift.link && (
-                    <a href={externalUrl(gift.link)} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} className="mt-5 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70" style={{ color: P.burgundy, borderBottom: `1px solid ${P.burgundy}70` }}>
+                    <a href={externalUrl(gift.link)} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()} className="mt-5 inline-block text-xs uppercase tracking-[0.14em] transition-opacity hover:opacity-70" style={{ color: P.rosewoodPink, borderBottom: `1px solid ${P.rosewoodPink}70` }}>
                       View gift ↗
                     </a>
                   )}
@@ -267,11 +267,11 @@ export function Wishlist() {
         {monetaryGifts.length > 0 && (
           <>
             <div className="mx-auto mt-16 max-w-2xl text-center">
-              <p className="text-xs uppercase tracking-[0.16em]" style={{ color: P.burgundy }}>
+              <p className="text-xs uppercase tracking-[0.16em]" style={{ color: P.rosewoodPink }}>
                 For Monetary Gifts
               </p>
               <div className="soft-divider mx-auto mt-3 max-w-24" />
-              <p className="mt-6 text-sm leading-7" style={{ color: P.burgundyDk }}>
+              <p className="mt-6 text-sm leading-7" style={{ color: P.rosewoodPinkDk }}>
                 While our unofficial theme song is... "How do I live without you," we'd still need the practicals of everyday life! We'd gladly accept monetary gifts as we learn the beautiful art of living together. Your generosity will help us build our little home, stock our fridge, and fund important married-life essentials... like rice, dishwashing liquid, and the occasional Grab delivery on days when "what's for dinner?" becomes a serious discussion.
               </p>
             </div>
@@ -288,7 +288,7 @@ export function Wishlist() {
                     {gift.title}
                   </h3>
                   {gift.description && (
-                    <p className="mt-2 text-sm leading-6" style={{ color: P.burgundyDk }}>
+                    <p className="mt-2 text-sm leading-6" style={{ color: P.rosewoodPinkDk }}>
                       {gift.description}
                     </p>
                   )}
@@ -311,16 +311,16 @@ export function Wishlist() {
                       />
                     </div>
                   ) : gift.qrCode ? (
-                    <p className="mt-6 text-xs italic" style={{ color: P.burgundyDk }}>
+                    <p className="mt-6 text-xs italic" style={{ color: P.rosewoodPinkDk }}>
                       QR code unavailable — check the sharing settings on the linked image.
                     </p>
                   ) : (
-                    <p className="mt-6 text-xs italic" style={{ color: P.burgundyDk }}>
+                    <p className="mt-6 text-xs italic" style={{ color: P.rosewoodPinkDk }}>
                       QR code coming soon.
                     </p>
                   )}
 
-                  <p className="mt-4 text-[0.65rem] uppercase tracking-[0.14em]" style={{ color: P.burgundyDk }}>
+                  <p className="mt-4 text-[0.65rem] uppercase tracking-[0.14em]" style={{ color: P.rosewoodPinkDk }}>
                     Scan to send a gift
                   </p>
                 </article>
@@ -330,21 +330,15 @@ export function Wishlist() {
         )}
 
         {registryGifts.length === 0 && monetaryGifts.length === 0 && (
-          <p className="mt-12 text-center text-sm italic" style={{ color: P.burgundyDk }}>
+          <p className="mt-12 text-center text-sm italic" style={{ color: P.rosewoodPinkDk }}>
             Gift preferences are on their way — thank you for your patience.
           </p>
         )}
           </>
         )}
 
-        <div className="mt-9 text-center">
-          <p className="text-sm italic" style={{ color: P.burgundy }}>
-            A contribution toward our future together is also deeply appreciated.
-          </p>
-        </div>
-
         {reservationSuccess && (
-          <p className="mt-5 text-center text-sm" style={{ color: P.burgundy }} role="status">
+          <p className="mt-5 text-center text-sm" style={{ color: P.rosewoodPink }} role="status">
             {reservationSuccess}
           </p>
         )}
@@ -374,17 +368,17 @@ export function Wishlist() {
                   {selectedGift.title}
                 </h2>
               </div>
-              <button type="button" onClick={closeReservation} className="text-2xl leading-none" style={{ color: P.burgundy }} aria-label="Close gift reservation form">
+              <button type="button" onClick={closeReservation} className="text-2xl leading-none" style={{ color: P.rosewoodPink }} aria-label="Close gift reservation form">
                 &times;
               </button>
             </div>
 
-            <p className="mt-5 text-sm leading-6" style={{ color: P.burgundyDk }}>
+            <p className="mt-5 text-sm leading-6" style={{ color: P.rosewoodPinkDk }}>
               Let us know who is reserving this gift. We will mark it as reserved for the couple.
             </p>
 
             <form className="mt-7 space-y-5" onSubmit={submitReservation}>
-              <label className="block text-sm" style={{ color: P.burgundyDk }}>
+              <label className="block text-sm" style={{ color: P.rosewoodPinkDk }}>
                 Your name
                 <input
                   required
@@ -395,7 +389,7 @@ export function Wishlist() {
                   style={{ color: P.black, borderColor: `${P.taupe}80` }}
                 />
               </label>
-              <label className="block text-sm" style={{ color: P.burgundyDk }}>
+              <label className="block text-sm" style={{ color: P.rosewoodPinkDk }}>
                 Email address
                 <input
                   required
@@ -406,7 +400,7 @@ export function Wishlist() {
                   style={{ color: P.black, borderColor: `${P.taupe}80` }}
                 />
               </label>
-              <label className="block text-sm" style={{ color: P.burgundyDk }}>
+              <label className="block text-sm" style={{ color: P.rosewoodPinkDk }}>
                 Note <span className="text-xs opacity-70">(optional)</span>
                 <textarea
                   rows={3}
@@ -418,7 +412,7 @@ export function Wishlist() {
               </label>
 
               {reservationError && (
-                <p className="text-sm" style={{ color: P.burgundy }} role="alert">
+                <p className="text-sm" style={{ color: P.rosewoodPink }} role="alert">
                   {reservationError}
                 </p>
               )}
@@ -427,7 +421,7 @@ export function Wishlist() {
                 type="submit"
                 disabled={isSubmittingReservation}
                 className="w-full border px-5 py-3 text-xs uppercase tracking-[0.16em] transition-opacity hover:opacity-80 disabled:cursor-wait disabled:opacity-50"
-                style={{ background: P.burgundy, borderColor: P.burgundy, color: P.champagne }}
+                style={{ background: P.rosewoodPink, borderColor: P.rosewoodPink, color: P.champagne }}
               >
                 {isSubmittingReservation ? "Reserving..." : "Reserve this gift"}
               </button>

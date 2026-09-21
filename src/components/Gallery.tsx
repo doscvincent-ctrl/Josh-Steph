@@ -30,7 +30,7 @@ export function Gallery() {
           </p>
           <h2
             className="font-display text-5xl md:text-6xl"
-            style={{ color: P.burgundy }}
+            style={{ color: P.rosewoodPink }}
           >
             Prenup Gallery
           </h2>
@@ -49,7 +49,7 @@ export function Gallery() {
             <div
               key={photo.src}
               className={`gallery-item gallery-item--${orientations[photo.src] || "landscape"} gallery-item--variant-${index % 5} cursor-pointer`}
-              style={{ backgroundColor: P.burgundy }}
+              style={{ backgroundColor: P.rosewoodPink }}
               onClick={() => setActive(index)}
             >
               <img

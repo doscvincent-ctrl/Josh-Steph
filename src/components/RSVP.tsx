@@ -271,7 +271,7 @@ export function RSVP() {
         <div className="text-center mb-8">
           <p
             className="text-xs uppercase tracking-[0.12em]"
-            style={{ color: P.burgundy, letterSpacing: "0.12em" }}
+            style={{ color: P.rosewoodPink, letterSpacing: "0.12em" }}
           >
             RSVP
           </p>
@@ -287,11 +287,11 @@ export function RSVP() {
           </h2>
           <div
             className="mt-3 flex items-center justify-center gap-3"
-            style={{ color: P.burgundy }}
+            style={{ color: P.rosewoodPink }}
           >
-            <span className="h-px w-12" style={{ background: P.burgundy }} />
+            <span className="h-px w-12" style={{ background: P.rosewoodPink }} />
             <span className="text-lg">♡</span>
-            <span className="h-px w-12" style={{ background: P.burgundy }} />
+            <span className="h-px w-12" style={{ background: P.rosewoodPink }} />
           </div>
         </div>
 
@@ -300,7 +300,7 @@ export function RSVP() {
             className="mx-auto rounded-2xl border px-6 py-10 text-center shadow-sm"
             style={{ background: P.champagne, borderColor: P.taupe }}
           >
-            <div className="text-3xl mb-3" style={{ color: P.burgundy }}>
+            <div className="text-3xl mb-3" style={{ color: P.rosewoodPink }}>
               ♡
             </div>
             <h3
@@ -311,7 +311,7 @@ export function RSVP() {
             </h3>
             <p
               className="text-sm leading-relaxed"
-              style={{ color: P.burgundyDk }}
+              style={{ color: P.rosewoodPinkDk }}
             >
               {submitMessage ||
                 (form.attendance === "yes"
@@ -321,7 +321,7 @@ export function RSVP() {
             {emailWarning && (
               <p
                 className="mt-3 text-xs leading-relaxed"
-                style={{ color: P.burgundy }}
+                style={{ color: P.rosewoodPink }}
               >
                 Your RSVP was saved, but the confirmation email couldn't be
                 sent. We'll follow up with you separately.
@@ -345,14 +345,14 @@ export function RSVP() {
                 </span>
               )}
               {codeStatus === "invalid" && (
-                <span className="text-base" style={{ color: P.burgundy }}>
+                <span className="text-base" style={{ color: P.rosewoodPink }}>
                   ✕
                 </span>
               )}
             </div>
 
             {codeStatus === "invalid" && (
-              <p className="mt-1.5 text-xs" style={{ color: P.burgundy }}>
+              <p className="mt-1.5 text-xs" style={{ color: P.rosewoodPink }}>
                 We couldn't find that code. Please check your invitation and try again.
               </p>
             )}
@@ -367,7 +367,7 @@ export function RSVP() {
             )}
 
             {codeStatus === "unavailable" && (
-              <p className="mt-1.5 text-xs" style={{ color: P.burgundy }}>
+              <p className="mt-1.5 text-xs" style={{ color: P.rosewoodPink }}>
                 We can't load the guest list right now. Please try again shortly.
               </p>
             )}
@@ -434,7 +434,7 @@ export function RSVP() {
               <div className="rounded-lg border px-4 py-3" style={fieldStyle}>
                 <p
                   className="mb-1.5 text-xs uppercase tracking-[0.12em]"
-                  style={{ color: P.burgundyDk }}
+                  style={{ color: P.rosewoodPinkDk }}
                 >
                   Invited Party
                 </p>
@@ -469,7 +469,7 @@ export function RSVP() {
             </div>
 
             {errorMessage && (
-              <p className="mt-3 text-xs" style={{ color: P.burgundy }}>
+              <p className="mt-3 text-xs" style={{ color: P.rosewoodPink }}>
                 {errorMessage}
               </p>
             )}
@@ -480,7 +480,7 @@ export function RSVP() {
                 disabled={isSubmitting || !isUnlocked}
                 className="w-full rounded-lg px-6 py-3 text-sm font-medium tracking-wide shadow-md transition-opacity hover:opacity-95 disabled:opacity-50"
                 style={{
-                  background: P.burgundy,
+                  background: P.rosewoodPink,
                   color: P.champagne,
                 }}
               >

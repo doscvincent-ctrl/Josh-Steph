@@ -38,7 +38,7 @@ export function OurStory() {
           </p>
           <h2
             className="font-display text-5xl md:text-6xl"
-            style={{ color: P.burgundy }}
+            style={{ color: P.rosewoodPink }}
           >
             Our Story
           </h2>
@@ -107,7 +107,7 @@ export function OurStory() {
 
                     <div
                       className={`p-8 md:p-10 ${i % 2 === 1 ? "md:order-1" : ""}`}
-                      style={{ borderRight: `3px solid ${P.pink}`, textAlign: "right" }}
+                      style={{ borderRight: `3px solid ${P.pink}`, textAlign: "left" }}
                     >
                       <div className="flex items-center justify-end gap-3 mb-5">
                         <p className="text-xs uppercase" style={{ color: P.pink, letterSpacing: "0.18em" }}>

@@ -44,7 +44,7 @@ export function Entourage() {
           </p>
           <h2
             className="font-display text-5xl md:text-6xl"
-            style={{ color: P.burgundy }}
+            style={{ color: P.rosewoodPink }}
           >
             Entourage
           </h2>
@@ -73,7 +73,7 @@ export function Entourage() {
             >
               <p
                 className="font-display text-3xl mb-5 text-center"
-                style={{ color: P.burgundy }}
+                style={{ color: P.rosewoodPink }}
               >
                 {role}
               </p>
