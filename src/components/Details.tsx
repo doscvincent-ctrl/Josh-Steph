@@ -156,7 +156,7 @@ export function Details() {
             Fruella’s Events Place Tagaytay
           </p>
           <p className="text-white/80 text-sm">
-            For easiest route, take this route -{'>'}
+            Best Route from Manila: From CALAX, take Sta Rosa exit or Aguinaldo Hi-way exit
           </p>
           <a
             href="https://www.google.com/maps/place/Fruella's+Events+Venue+Tagaytay/@14.1327979,120.9289331,17z/data=!3m1!4b1!4m6!3m5!1s0x33bd796d1fd7f119:0x5fccd52277bc6f1!8m2!3d14.1327979!4d120.931508!16s%2Fg%2F11v0gyk507?entry=ttu&g_ep=EgoyMDI2MDgyNi4wIKXMDSoASAFQAw%3D%3D"
