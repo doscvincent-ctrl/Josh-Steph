@@ -148,7 +148,7 @@ export function Details() {
         >
           <p
             className="font-display text-3xl mb-2"
-            style={{ color: `${P.champagne}99` }}
+            style={{ color: P.champagne }}
           >
             Location
           </p>
