@@ -48,7 +48,7 @@ export function Details() {
             <div
               className="h-px w-24"
               style={{
-                background: `linear-gradient(to right, transparent, ${P.pink}, transparent)`,
+                background: `linear-gradient(to right, transparent, ${P.champagne}, transparent)`,
               }}
             />
           </div>
@@ -63,20 +63,20 @@ export function Details() {
                 key={d.label || index}
                 className="text-center p-8 transition-colors"
                 style={{
-                  border: `1px solid ${P.pink}30`,
+                  border: `1px solid ${P.champagne}30`,
                   background: "rgba(196,144,144,0.08)",
                 }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.border = `1px solid ${P.pink}60`)
+                  (e.currentTarget.style.border = `1px solid ${P.champagne}60`)
                 }
                 onMouseLeave={(e) =>
-                  (e.currentTarget.style.border = `1px solid ${P.pink}30`)
+                  (e.currentTarget.style.border = `1px solid ${P.champagne}30`)
                 }
               >
                 {d.icon && (
                   <div
                     className="text-3xl mb-4"
-                    style={{ color: P.pink }}
+                    style={{ color: P.champagne }}
                   >
                     {d.icon}
                   </div>
@@ -84,14 +84,14 @@ export function Details() {
                 {d.label && (
                   <p
                     className="font-display text-3xl mb-4"
-                    style={{ color: P.pink }}
+                    style={{ color: P.champagne }}
                   >
                     {d.label}
                   </p>
                 )}
                 <div
                   className="h-px mb-4 mx-6"
-                  style={{ background: `${P.pink}30` }}
+                  style={{ background: `${P.champagne}30` }}
                 />
                 {d.line1 && (
                   <p className="text-white text-sm leading-loose">
@@ -132,11 +132,11 @@ export function Details() {
           </p>
           <div
             className="overflow-hidden rounded-sm border"
-            style={{ borderColor: `${P.pink}60` }}
+            style={{ borderColor: `${P.champagne}60` }}
           >
             <img
               src={entourageGuideImage}
-              alt="Wedding entourage dress code reference showing the beige and dusty pink color palette"
+              alt="Wedding entourage dress code reference showing the beige and dusty champagne color palette"
               className="block h-auto w-full"
             />
           </div>
@@ -144,11 +144,11 @@ export function Details() {
 
         <div
           className="mt-10 p-6 text-center"
-          style={{ border: `1px solid ${P.pink}30` }}
+          style={{ border: `1px solid ${P.champagne}30` }}
         >
           <p
             className="font-display text-3xl mb-2"
-            style={{ color: `${P.pink}99` }}
+            style={{ color: `${P.champagne}99` }}
           >
             Location
           </p>
@@ -163,12 +163,12 @@ export function Details() {
             target="_blank"
             rel="noreferrer"
             className="inline-block mt-4 text-xs tracking-[0.2em] uppercase pb-0.5 transition-colors"
-            style={{ color: P.pink, borderBottom: `1px solid ${P.pink}40` }}
+            style={{ color: P.champagne, borderBottom: `1px solid ${P.champagne}40` }}
             onMouseEnter={(e) =>
-              (e.currentTarget.style.borderBottomColor = P.pink)
+              (e.currentTarget.style.borderBottomColor = P.champagne)
             }
             onMouseLeave={(e) =>
-              (e.currentTarget.style.borderBottomColor = `${P.pink}40`)
+              (e.currentTarget.style.borderBottomColor = `${P.champagne}40`)
             }
           >
             View on Google Maps →
