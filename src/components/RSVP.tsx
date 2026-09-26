@@ -229,9 +229,9 @@ export function RSVP() {
 
       setSubmitMessage(
         result.message ||
-          (form.attendance === "yes"
-            ? "We've saved your RSVP and look forward to celebrating with you."
-            : "We've received your response and are sorry you can't make it."),
+        (form.attendance === "yes"
+          ? "We've saved your RSVP and look forward to celebrating with you."
+          : "We've received your response and are sorry you can't make it."),
       )
       setEmailWarning(result.emailSent === false)
       setSubmitted(true)
@@ -373,30 +373,29 @@ export function RSVP() {
             )}
 
             <div
-              className={`mt-3 space-y-3 transition-opacity ${
-                isUnlocked
-                  ? "opacity-100"
-                  : "pointer-events-none opacity-40"
-              }`}
+              className={`mt-3 space-y-3 transition-opacity ${isUnlocked
+                ? "opacity-100"
+                : "pointer-events-none opacity-40"
+                }`}
             >
               <div className={fieldWrapClass} style={fieldStyle}>
-          <input
-            type="email"
-            value={form.email}
-            onChange={(event) => {
-              setErrorMessage("")
-              setForm((current) => ({
-                ...current,
-                email: event.target.value,
-              }))
-            }}
-            placeholder="Enter your email address"
-            className={fieldClass}
-            autoComplete="email"
-            disabled={!isUnlocked}
-            required
-          />
-        </div>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(event) => {
+                    setErrorMessage("")
+                    setForm((current) => ({
+                      ...current,
+                      email: event.target.value,
+                    }))
+                  }}
+                  placeholder="Enter your email address"
+                  className={fieldClass}
+                  autoComplete="email"
+                  disabled={!isUnlocked}
+                  required
+                />
+              </div>
               {/* Conditional Attendance Dropdown */}
               <div className={fieldWrapClass} style={fieldStyle}>
                 <select
@@ -408,7 +407,7 @@ export function RSVP() {
                   className={`${fieldClass} appearance-none`}
                 >
                   <option value="">Will you attend?</option>
-                  
+
                   {maxGuests === 1 ? (
                     <>
                       <option value="yes">Yes, I am attending</option>
@@ -436,7 +435,7 @@ export function RSVP() {
                   className="mb-1.5 text-xs uppercase tracking-[0.12em]"
                   style={{ color: P.rosewoodPinkDk }}
                 >
-                  Invited Party
+                  Invited Guest
                 </p>
                 {matchedParty ? (
                   <ul className="space-y-1 text-[0.9rem] opacity-80">
@@ -461,7 +460,7 @@ export function RSVP() {
                     message: event.target.value,
                   }))
                 }}
-                placeholder="Message"
+                placeholder="Any message to the couple?"
                 rows={3}
                 className="w-full resize-none rounded-lg px-4 py-3 text-[0.9rem] outline-none placeholder:opacity-60 border"
                 style={fieldStyle}
