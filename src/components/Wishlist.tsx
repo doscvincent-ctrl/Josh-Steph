@@ -390,9 +390,8 @@ export function Wishlist() {
                 />
               </label>
               <label className="block text-sm" style={{ color: P.rosewoodPinkDk }}>
-                Email address
+                Email address <span className="text-xs opacity-70">(optional)</span>
                 <input
-                  required
                   type="email"
                   value={reservationForm.guestEmail}
                   onChange={(event) => setReservationForm((current) => ({ ...current, guestEmail: event.target.value }))}

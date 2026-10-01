@@ -188,13 +188,6 @@ function doPost(e) {
     })
   }
 
-  if (!submittedEmail) {
-    return jsonResponse({
-      ok: false,
-      message: "An email address is required.",
-    })
-  }
-
   // Update each person's own row according to the checkbox selection.
   partyRows.forEach((guest) => {
     const submittedGuest = attendingGuests.find(
@@ -226,9 +219,9 @@ function doPost(e) {
       .setValue(submittedEmail)
   }
 
-  // Send the confirmation to the address entered in the RSVP form.
+  // Send confirmation only when the guest provided an email address.
   let emailSent = false
-  try {
+  if (submittedEmail) try {
     const attendingNames = partyRows
       .filter((guest) => {
         const submittedGuest = attendingGuests.find(
@@ -269,7 +262,7 @@ function doPost(e) {
   return jsonResponse({
     ok: true,
     message: "RSVP recorded successfully.",
-    emailSent,
+    ...(submittedEmail ? { emailSent } : {}),
   })
 }
 
@@ -280,10 +273,10 @@ function reserveGift(spreadsheet, data) {
   const guestEmail = String(data.guestEmail || "").trim()
   const message = String(data.message || "").trim()
 
-  if (!giftId || !giftTitle || !guestName || !guestEmail) {
+  if (!giftId || !giftTitle || !guestName) {
     return jsonResponse({
       ok: false,
-      message: "Gift, guest name, and email are required.",
+      message: "Gift and guest name are required.",
     })
   }
 

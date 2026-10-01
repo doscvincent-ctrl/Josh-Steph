@@ -204,11 +204,6 @@ export function RSVP() {
       return
     }
 
-    if (!form.email.trim()) {
-      setErrorMessage("Please enter your email address.")
-      return
-    }
-
     setIsSubmitting(true)
     setErrorMessage("")
 
@@ -393,7 +388,6 @@ export function RSVP() {
                   className={fieldClass}
                   autoComplete="email"
                   disabled={!isUnlocked}
-                  required
                 />
               </div>
               {/* Conditional Attendance Dropdown */}
