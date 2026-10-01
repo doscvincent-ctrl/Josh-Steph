@@ -95,7 +95,7 @@ export function OurStory() {
                         </p>
                       </div>
                       <blockquote
-                        className="font-story"
+                        className="font-display"
                         style={{ fontSize: "1.35rem", lineHeight: 1.55, color: P.black, fontStyle: "italic" }}
                       >
                         &ldquo;{item.heSaid}&rdquo;
@@ -130,7 +130,7 @@ export function OurStory() {
                         </div>
                       </div>
                       <blockquote
-                        className="font-story"
+                        className="font-display"
                         style={{ fontSize: "1.35rem", lineHeight: 1.55, color: P.black, fontStyle: "italic" }}
                       >
                         &ldquo;{item.sheSaid}&rdquo;
