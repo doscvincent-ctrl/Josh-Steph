@@ -14,8 +14,10 @@ export function isSaveTheDatePath(): boolean {
   return (
     path.includes("save-the-date") ||
     path.includes("photo-scratch") ||
+    path.includes("scratch") ||
     hash === "#save-the-date" ||
     hash === "#photo-scratch" ||
+    hash === "#scratch" ||
     view === "save-the-date" ||
     view === "photo-scratch" ||
     view === "scratch" ||
@@ -30,14 +32,23 @@ export function isSharedGalleryPath(): boolean {
   if (typeof window === "undefined") return false
 
   const path = window.location.pathname.toLowerCase()
+  const hash = window.location.hash.toLowerCase()
   const params = new URLSearchParams(window.location.search)
   const view = (params.get("view") || params.get("page") || "").toLowerCase()
+  const q = (params.get("q") || params.get("search") || params.get("query") || "").toLowerCase()
 
   return (
     path.includes("shared-gallery") ||
     path.includes("photo-gallery") ||
+    path.includes("gallery") ||
+    hash === "#shared-gallery" ||
+    hash === "#photo-gallery" ||
+    hash === "#gallery" ||
     view === "shared-gallery" ||
-    view === "gallery"
+    view === "gallery" ||
+    view === "photo-gallery" ||
+    q.includes("shared-gallery") ||
+    q.includes("gallery")
   )
 }
 
