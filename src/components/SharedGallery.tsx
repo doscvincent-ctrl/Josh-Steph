@@ -208,7 +208,7 @@ export function SharedGallery() {
           className="text-xs tracking-[0.22em] uppercase mb-3 animate-fade-up"
           style={{ color: "#C49090" }}
         >
-          Josh &amp; Stephanie
+          Josh &amp; Steph
         </p>
         <h1
           className="font-display text-5xl md:text-6xl mb-3 animate-fade-up delay-200"
@@ -537,7 +537,7 @@ export function SharedGallery() {
         className="text-center py-8 text-xs tracking-widest uppercase"
         style={{ color: "rgba(26,26,26,0.4)" }}
       >
-        Josh &amp; Stephanie · Wedding Memories
+        Josh &amp; Steph · Wedding Memories
       </footer>
     </div>
   )
@@ -627,9 +627,8 @@ function PhotoCard({ photo, onClick }: { photo: Photo; onClick: () => void }) {
             setFailed(false)
           }}
           onError={handleError}
-          className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
-            loading ? "opacity-0" : "opacity-100"
-          }`}
+          className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${loading ? "opacity-0" : "opacity-100"
+            }`}
         />
       )}
 
@@ -752,9 +751,8 @@ function LightboxModal({
         onLoad={() => setLoading(false)}
         onError={handleError}
         onClick={(e) => e.stopPropagation()}
-        className={`max-h-[85vh] max-w-[90vw] rounded-xl object-contain shadow-2xl transition-opacity duration-300 ${
-          loading ? "opacity-30" : "opacity-100"
-        }`}
+        className={`max-h-[85vh] max-w-[90vw] rounded-xl object-contain shadow-2xl transition-opacity duration-300 ${loading ? "opacity-30" : "opacity-100"
+          }`}
       />
 
       {/* Next */}
