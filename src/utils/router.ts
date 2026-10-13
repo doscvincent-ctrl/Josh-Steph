@@ -26,12 +26,29 @@ export function isSaveTheDatePath(): boolean {
   )
 }
 
+export function isSharedGalleryPath(): boolean {
+  if (typeof window === "undefined") return false
+
+  const path = window.location.pathname.toLowerCase()
+  const params = new URLSearchParams(window.location.search)
+  const view = (params.get("view") || params.get("page") || "").toLowerCase()
+
+  return (
+    path.includes("shared-gallery") ||
+    path.includes("photo-gallery") ||
+    view === "shared-gallery" ||
+    view === "gallery"
+  )
+}
+
 export function useCurrentRoute() {
   const [isScratchPage, setIsScratchPage] = useState(isSaveTheDatePath)
+  const [isGalleryPage, setIsGalleryPage] = useState(isSharedGalleryPath)
 
   useEffect(() => {
     const handleLocationChange = () => {
       setIsScratchPage(isSaveTheDatePath())
+      setIsGalleryPage(isSharedGalleryPath())
     }
 
     window.addEventListener("popstate", handleLocationChange)
@@ -53,6 +70,7 @@ export function useCurrentRoute() {
     url.hash = ""
     window.history.pushState({}, "", url.pathname + url.search)
     setIsScratchPage(false)
+    setIsGalleryPage(false)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
@@ -61,8 +79,16 @@ export function useCurrentRoute() {
     url.searchParams.set("view", "save-the-date")
     window.history.pushState({}, "", url.toString())
     setIsScratchPage(true)
+    setIsGalleryPage(false)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  return { isScratchPage, navigateToMain, navigateToScratch }
+  const navigateToGallery = () => {
+    window.history.pushState({}, "", "/shared-gallery")
+    setIsGalleryPage(true)
+    setIsScratchPage(false)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  return { isScratchPage, isGalleryPage, navigateToMain, navigateToScratch, navigateToGallery }
 }

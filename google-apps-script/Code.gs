@@ -219,50 +219,141 @@ function doPost(e) {
       .setValue(submittedEmail)
   }
 
-  // Send confirmation only when the guest provided an email address.
+  // Send the confirmation to the address entered in the RSVP form.
   let emailSent = false
-  if (submittedEmail) try {
-    const attendingNames = partyRows
-      .filter((guest) => {
-        const submittedGuest = attendingGuests.find(
-          (item) =>
-            item &&
-            normalizeName(item.name) === normalizeName(guest.name),
-        )
+  if (submittedEmail) {
+    try {
+      const attendingNames = partyRows
+        .filter((guest) => {
+          const submittedGuest = attendingGuests.find(
+            (item) =>
+              item &&
+              normalizeName(item.name) === normalizeName(guest.name),
+          )
 
-        return !!(submittedGuest && submittedGuest.attending)
+          return !!(submittedGuest && submittedGuest.attending)
+        })
+        .map((guest) => guest.name)
+        .filter(Boolean)
+
+      const declinedNames = partyRows
+        .filter((guest) => {
+          const submittedGuest = attendingGuests.find(
+            (item) =>
+              item &&
+              normalizeName(item.name) === normalizeName(guest.name),
+          )
+
+          return !(submittedGuest && submittedGuest.attending)
+        })
+        .map((guest) => guest.name)
+        .filter(Boolean)
+
+      const firstName = partyRows[0]?.name || "guest"
+
+      const guestListHtml = attendingNames.length
+        ? `<ul style="margin:0; padding-left:20px; color:#3a3a3a;">${attendingNames
+            .map(
+              (name) =>
+                `<li style="margin-bottom:6px; font-size:15px;">${escapeHtml(name)}</li>`,
+            )
+            .join("")}</ul>`
+        : `<p style="margin:0; color:#3a3a3a; font-size:15px;">No guests will be attending.</p>`
+
+      const declinedListHtml = declinedNames.length
+        ? `<ul style="margin:0; padding-left:20px; color:#3a3a3a;">${declinedNames
+            .map(
+              (name) =>
+                `<li style="margin-bottom:6px; font-size:15px;">${escapeHtml(name)}</li>`,
+            )
+            .join("")}</ul>`
+        : ""
+
+      const htmlBody = `
+        <div style="background-color:#f5f2ee; padding:40px 20px; font-family: Georgia, 'Times New Roman', serif;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px; margin:0 auto; background-color:#ffffff; border:1px solid #e3ddd3; border-radius:6px; overflow:hidden;">
+            <tr>
+              <td style="background-color:#5c4b3a; padding:28px 32px; text-align:center;">
+                <p style="margin:0; color:#f5f2ee; font-size:13px; letter-spacing:2px; text-transform:uppercase;">RSVP Confirmation</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:32px 36px;">
+                <p style="margin:0 0 16px 0; font-size:16px; color:#2b2b2b; line-height:1.6;">
+                  Dear ${escapeHtml(firstName)},
+                </p>
+                <p style="margin:0 0 20px 0; font-size:15px; color:#3a3a3a; line-height:1.6;">
+                  ${attendingNames.length
+                    ? "Thank you for responding to our wedding invitation. We are delighted to confirm the details of your RSVP below."
+                    : "Thank you for letting us know you won't be able to attend. We understand and appreciate you taking the time to respond."
+                  }
+                </p>
+                ${attendingNames.length ? `
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9f7f4; border-left:3px solid #5c4b3a; border-radius:4px; margin-bottom:24px;">
+                    <tr>
+                      <td style="padding:18px 20px;">
+                        <p style="margin:0 0 10px 0; font-size:13px; letter-spacing:1px; text-transform:uppercase; color:#5c4b3a; font-weight:bold;">
+                          Guests Attending
+                        </p>
+                        ${guestListHtml}
+                      </td>
+                    </tr>
+                  </table>
+                ` : ""}
+                ${declinedNames.length ? `
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9f7f4; border-left:3px solid #a99a88; border-radius:4px; margin-bottom:24px;">
+                    <tr>
+                      <td style="padding:18px 20px;">
+                        <p style="margin:0 0 10px 0; font-size:13px; letter-spacing:1px; text-transform:uppercase; color:#5c4b3a; font-weight:bold;">
+                          Guests Unable to Attend
+                        </p>
+                        ${declinedListHtml}
+                      </td>
+                    </tr>
+                  </table>
+                ` : ""}
+                <p style="margin:0 0 8px 0; font-size:15px; color:#3a3a3a; line-height:1.6;">
+                  ${attendingNames.length
+                    ? "We look forward to celebrating this special occasion with you."
+                    : "We'll miss celebrating with you and hope to see you another time."
+                  }
+                </p>
+                <p style="margin:24px 0 0 0; font-size:15px; color:#2b2b2b; line-height:1.6;">
+                  Warm regards,<br />
+                  <span style="font-style:italic;">Josh &amp; Steph</span>
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="background-color:#f5f2ee; padding:16px 32px; text-align:center; border-top:1px solid #e3ddd3;">
+                <p style="margin:0; font-size:12px; color:#8a8a8a;">
+                  This is a confirmation of your RSVP submission. Please contact us directly if any details need to be corrected.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </div>
+      `
+
+      MailApp.sendEmail({
+        to: submittedEmail,
+        subject: attendingNames.length
+          ? "RSVP Confirmation — Thank You for Your Response"
+          : "RSVP Response — Thank You for Letting Us Know",
+        htmlBody,
       })
-      .map((guest) => guest.name)
-      .filter(Boolean)
-
-    const firstName = partyRows[0]?.name || "guest"
-
-    MailApp.sendEmail({
-      to: submittedEmail,
-      subject: "RSVP confirmation",
-      htmlBody: [
-        `<p>Dear ${escapeHtml(firstName)},</p>`,
-        "<p>Thank you for responding to our wedding invitation.</p>",
-        "<p><strong>Guests attending:</strong></p>",
-        attendingNames.length
-          ? `<ul>${attendingNames
-              .map((name) => `<li>${escapeHtml(name)}</li>`)
-              .join("")}</ul>`
-          : "<p>No guests will be attending.</p>",
-        "<p>We look forward to celebrating with you.</p>",
-      ].join(""),
-    })
-    emailSent = true
-  } catch (error) {
-    console.error(
-      `RSVP saved, but confirmation email failed: ${error}`,
-    )
+      emailSent = true
+    } catch (error) {
+      console.error(
+        `RSVP saved, but confirmation email failed: ${error}`,
+      )
+    }
   }
 
   return jsonResponse({
     ok: true,
     message: "RSVP recorded successfully.",
-    ...(submittedEmail ? { emailSent } : {}),
+    emailSent,
   })
 }
 

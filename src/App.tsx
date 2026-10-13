@@ -7,14 +7,19 @@ import { Nav } from "./components/Nav"
 import { OurStory } from "./components/OurStory"
 import { RSVP } from "./components/RSVP"
 import { SaveTheDateScratch } from "./components/SaveTheDateScratch"
+import { SharedGallery } from "./components/SharedGallery"
 import { Wishlist } from "./components/Wishlist"
 import { useCurrentRoute } from "./utils/router"
 
 export default function App() {
-  const { isScratchPage } = useCurrentRoute()
+  const { isScratchPage, isGalleryPage } = useCurrentRoute()
 
   if (isScratchPage) {
     return <SaveTheDateScratch />
+  }
+
+  if (isGalleryPage) {
+    return <SharedGallery />
   }
 
   return (
